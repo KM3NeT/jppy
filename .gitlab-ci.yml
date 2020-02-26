@@ -78,21 +78,20 @@ test-jpp-latest:
             - pdfs/
 
 
-# pages:
-#     image: docker.km3net.de/base/python:3.6
-#     stage: doc
-#     script:
-#         - *virtualenv_definition
-#         - pip install sphinx
-#         - cd doc && make clean && make html
-#         - mv _build/html ../public/
-#     artifacts:
-#         paths:
-#             - public
-#     cache: {}
-#     only:
-#         - tags
-#         - master
+pages:
+    image: docker.km3net.de/base/python:3.6
+    stage: doc
+    script:
+        - pip install -U sphinx
+        - cd doc && make clean && make html
+        - mv _build/html ../public/
+    artifacts:
+        paths:
+            - public
+    cache: {}
+    only:
+        - tags
+        - master
 
 
 pypi:
