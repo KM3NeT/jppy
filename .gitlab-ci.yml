@@ -17,6 +17,13 @@ stages:
     - build
 
 
+before_script:
+    - yum install -y epel-release
+    - yum install -y python-pip python-devel
+    - _CWD=$(pwd) && cd /usr/local/root && source bin/thisroot.sh && cd $_CWD
+    - source /Jpp/setenv.sh /Jpp
+
+
 .virtualenv_template: &virtualenv_definition |
   python -V
   pip install -U pip setuptools wheel
@@ -24,6 +31,7 @@ stages:
   virtualenv venv
   source venv/bin/activate
   pip install .
+
 
 .junit_template: &junit_definition
     artifacts:
@@ -35,11 +43,21 @@ build-jpp-12.1.0:
     image: docker.km3net.de/jpp:v12-1-0
     stage: build
     script:
-        - yum install -y epel-release
-        - yum install -y python-pip python-devel
-        - _CWD=$(pwd) && cd /usr/local/root && source bin/thisroot.sh && cd $_CWD
-        - which -a root
-        - which -a python
-        - python -c "import ROOT"
-        - source /Jpp/setenv.sh /Jpp
         - *virtualenv_definition
+
+build-jpp-latest:
+    image: docker.km3net.de/jpp:latest
+    stage: build
+    script:
+        - *virtualenv_definition
+
+pypi:
+    image: docker.km3net.de/base/python:3
+    stage: release
+    cache: {}
+    script:
+        - pip install -U twine setuptools
+        - python setup.py sdist
+        - twine upload dist/*
+    only:
+        - tags
