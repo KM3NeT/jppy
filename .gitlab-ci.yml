@@ -19,10 +19,10 @@ stages:
 
 .virtualenv_template: &virtualenv_definition |
   python -V
+  pip install -U pip setuptools wheel
   pip install virtualenv
   virtualenv venv
   source venv/bin/activate
-  pip install -U pip setuptools
   pip install .
 
 .junit_template: &junit_definition
