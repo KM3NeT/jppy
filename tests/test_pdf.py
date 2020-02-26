@@ -1,8 +1,7 @@
-import os
 import unittest
 import jppy
 
-PDFS = os.path.expandvars("$JPP_DIR/data/J%p.dat")
+PDFS = "pdfs/J%p.dat"
 
 class TestMuonPDF(unittest.TestCase):
     def test_pdf(self):
