@@ -15,6 +15,7 @@ cache:
 
 stages:
     - build
+    - release
 
 
 before_script:
