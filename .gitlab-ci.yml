@@ -16,6 +16,7 @@ cache:
 stages:
     - build
     - test
+    - doc
     - release
 
 
@@ -75,6 +76,23 @@ test-jpp-latest:
     cache:
         paths:
             - pdfs/
+
+
+pages:
+    image: docker.km3net.de/base/python:3.6
+    stage: doc
+    script:
+        - *virtualenv_definition
+        - cd doc && make clean && make html
+        - mv _build/html ../public/
+    artifacts:
+        paths:
+            - public
+    cache: {}
+    only:
+        - tags
+        - master
+
 
 pypi:
     image: docker.km3net.de/base/python:3
