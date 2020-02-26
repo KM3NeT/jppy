@@ -22,12 +22,15 @@ class get_pybind_include(object):
 
 def get_root_flags(kind):
     """Retrieve the root flags for kind='inc' or kind'='lib'"""
-    return sp.Popen(["root-config", "--{}dir".format(kind)],
-                    stdout=sp.PIPE).communicate()[0].strip().decode()
+    try:
+        return sp.Popen(["root-config", "--{}dir".format(kind)],
+                        stdout=sp.PIPE).communicate()[0].strip().decode()
+    except OSError:
+        return ""
 
 
 def get_jpp_include():
-    return os.path.join(os.getenv("JPP_DIR"), "software")
+    return os.path.join(os.getenv("JPP_DIR", ""), "software")
 
 
 ext_modules = [
