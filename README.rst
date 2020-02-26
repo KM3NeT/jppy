@@ -22,6 +22,11 @@ ROOT ``TMath`` (a compiled ROOT installation is needed).
 Installation
 ============
 
+If you work on the Lyon CC, you can load the ``jpp/master`` module which
+contains the latest release of ``jppy``::
+
+    module load jpp/master
+
 The package can be installed via ``pip``::
 
     pip install jppy
