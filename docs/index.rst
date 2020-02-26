@@ -1,5 +1,4 @@
-jppy Documentation
-============================
+.. include:: ../README.rst
 
 Contents:
 
