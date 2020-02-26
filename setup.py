@@ -138,7 +138,8 @@ setup(
     long_description=long_description,
     ext_modules=ext_modules,
     install_requires=['pybind11>=2.4'],
-    setup_requires=['pybind11>=2.4'],
+    setup_requires=['pybind11>=2.4', 'setuptools_scm'],
+    use_scm_version=True,
     cmdclass={'build_ext': BuildExt},
     zip_safe=False,
 )
