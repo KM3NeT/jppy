@@ -15,6 +15,7 @@ cache:
 
 stages:
     - build
+    - test
     - release
 
 
@@ -48,6 +49,22 @@ build-jpp-latest:
     stage: build
     script:
         - *virtualenv_definition
+
+test-jpp-12.1.0:
+    image: docker.km3net.de/jpp:v12-1-0
+    stage: build
+    script:
+        - *virtualenv_definition
+        - pip install -U pytest
+        - pytest
+
+test-jpp-latest:
+    image: docker.km3net.de/jpp:latest
+    stage: build
+    script:
+        - *virtualenv_definition
+        - pip install -U pytest
+        - pytest
 
 pypi:
     image: docker.km3net.de/base/python:3
