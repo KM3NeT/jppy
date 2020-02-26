@@ -18,14 +18,11 @@ stages:
     - release
 
 
-before_script:
-    - yum install -y epel-release
-    - yum install -y python-pip python-devel
-    - _CWD=$(pwd) && cd /usr/local/root && source bin/thisroot.sh && cd $_CWD
-    - source /Jpp/setenv.sh /Jpp
-
-
 .virtualenv_template: &virtualenv_definition |
+  yum install -y epel-release
+  yum install -y python-pip python-devel
+  _CWD=$(pwd) && cd /usr/local/root && source bin/thisroot.sh && cd $_CWD
+  source /Jpp/setenv.sh /Jpp
   python -V
   pip install -U pip setuptools wheel
   pip install virtualenv
