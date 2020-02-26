@@ -52,7 +52,7 @@ build-jpp-latest:
 
 test-jpp-12.1.0:
     image: docker.km3net.de/jpp:v12-1-0
-    stage: build
+    stage: test
     script:
         - *virtualenv_definition
         - mkdir -p pdfs
@@ -65,7 +65,7 @@ test-jpp-12.1.0:
 
 test-jpp-latest:
     image: docker.km3net.de/jpp:latest
-    stage: build
+    stage: test
     script:
         - *virtualenv_definition
         - mkdir -p pdfs
