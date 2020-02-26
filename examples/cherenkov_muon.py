@@ -6,11 +6,11 @@
 Plot PDF of Cherenkov light from muon using Jpp interpolation tables.
 
 Usage:
-    cherenkov_muon.py [options] -f FILE_DESCRIPTOR
+    cherenkov_muon.py [options]
     cherenkov_muon.py (-h | --help)
 
 Options:
-    -f FILE_DESCRIPTOR  Descriptor of the PDFs (e.g. $JPP_DIR/data/J%p.dat).
+    -f FILE_DESCRIPTOR  Descriptor of the PDFs [default: $JPP_DIR/data/J%p.dat].
     --energy=<GeV>      Muon energy [default: 1e3].
     --distance=<m>      Distance of approach [default: 50].
     --tts=<ns>          PMT time smearing [default: 0.0].
@@ -27,6 +27,7 @@ from docopt import docopt
 docopt(__doc__)
 
 import functools
+import os
 
 import matplotlib
 matplotlib.use("Agg")
@@ -46,7 +47,8 @@ def main():
         "west": (np.pi / 2, np.pi)
     }
 
-    muon_pdf = jppy.pdf.JMuonPDF(args['-f'], TTS=float(args['--tts']))
+    muon_pdf = jppy.pdf.JMuonPDF(os.path.expandvars(args['-f']),
+                                 TTS=float(args['--tts']))
 
     xs = np.linspace(float(args['--xmin']), float(args['--xmax']),
                      int(args['--n-points']))
