@@ -5,8 +5,6 @@ import sys
 import setuptools
 import subprocess as sp
 
-__version__ = '3.0.0'
-
 
 class get_pybind_include(object):
     """Helper class to determine the pybind11 include path
@@ -50,6 +48,7 @@ ext_modules = [
 # Populating the __init__.py with submodule imports, so that one can import
 # the package and use the submodules directly with the dot-sytax.
 with open("jppy/__init__.py", "w") as fobj:
+    fobj.write("from .version import version\n")
     for module in ext_modules:
         fobj.write("from . import {}\n".format(module.name.split('.')[1]))
 
@@ -128,7 +127,6 @@ class BuildExt(build_ext):
 
 setup(
     name='jppy',
-    version=__version__,
     author='Tamas Gal',
     author_email='tgal@km3net.de',
     url='https://git.km3net.de/km3py/jppy',
