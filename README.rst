@@ -22,7 +22,12 @@ ROOT ``TMath`` (a compiled ROOT installation is needed).
 Installation
 ============
 
-The package can be installed via ``pip`` directly from the Git repository::
+The package can be installed via ``pip``::
+
+    pip install jppy
+
+or directly from the Git repository to get the latest stable from the
+``master`` branch::
 
     pip install git+https://git.km3net.de/km3py/jppy
 
