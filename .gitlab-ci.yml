@@ -57,7 +57,7 @@ test-jpp-12.1.0:
     script:
         - *virtualenv_definition
         - mkdir -p pdfs
-        - JMakePDF.sh -W $(pwd)/pdfs -w http://pi1139.physik.uni-erlangen.de/data/latest/ -C
+        - [ ! -d "pdfs" ] && mkdir pdfs && JMakePDF.sh -W $(pwd)/pdfs -w http://pi1139.physik.uni-erlangen.de/data/latest/ -C
         - pip install -U pytest
         - pytest
     cache:
@@ -69,8 +69,7 @@ test-jpp-latest:
     stage: test
     script:
         - *virtualenv_definition
-        - mkdir -p pdfs
-        - JMakePDF.sh -W $(pwd)/pdfs -w http://pi1139.physik.uni-erlangen.de/data/latest/ -C
+        - [ ! -d "pdfs" ] && mkdir pdfs && JMakePDF.sh -W $(pwd)/pdfs -w http://pi1139.physik.uni-erlangen.de/data/latest/ -C
         - pip install -U pytest
         - pytest
     cache:
@@ -83,7 +82,7 @@ pages:
     stage: doc
     script:
         - pip install -U sphinx
-        - cd doc && make clean && make html
+        - cd docs && make clean && make html
         - mv _build/html ../public/
     artifacts:
         paths:
