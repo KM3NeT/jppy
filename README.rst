@@ -10,22 +10,30 @@ The jppy Python package
 .. image:: https://examples.pages.km3net.de/km3badges/docs-latest-brightgreen.svg
     :target: https://km3py.pages.km3net.de/jppy
 
-This software provides access to the PDF functionalities in Jpp. It depends on
-some Jpp headers (no Jpp compilation needed) and on the ROOT ``TMath`` (a
-compiled ROOT installation is needed).
+This software provides Python access to functionalities in Jpp, like accesing
+PDF functions.
 
-**Note:** Beware that this package is in the development phase, so the API will
-change until version ``1.0.0`` is released!
+It currently depends on a few Jpp headers (no Jpp compilation needed) and on
+ROOT ``TMath`` (a compiled ROOT installation is needed).
+
+**Note:** Beware that this package is WIP!
+
 
 Installation
 ============
 
-Run ``make`` to compile the Python modules::
+The package can be installed via ``pip`` directly from the Git repository::
 
-  make
+    pip install git+https://git.km3net.de/km3py/jppy
 
-Example
-=======
+or from a local clone::
+
+    git clone https://git.km3net.de/km3py/jppy
+    pip install jppy/
+
+
+Example - Using PDFs
+====================
 
 Here is an example how to play around with muon PDFs using the ``jppy`` module::
 
