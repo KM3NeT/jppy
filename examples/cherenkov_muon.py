@@ -11,7 +11,7 @@ Usage:
 
 Options:
     -f FILE_DESCRIPTOR  Descriptor of the PDFs (e.g. $JPP_DIR/data/J%p.dat).
-    --energy=<GeV>      Muon energy [default: 1.0].
+    --energy=<GeV>      Muon energy [default: 1e3].
     --distance=<m>      Distance of approach [default: 50].
     --tts=<ns>          PMT time smearing [default: 0.0].
     --xmin=<ns>         X-axis minimum [default: -20].
@@ -62,6 +62,9 @@ def main():
         ax.plot(xs, list(map(pdf, xs)), label=direction)
         ax.set_yscale("log")
 
+    plt.title(
+        "PDF of Cherenkov light from muon with E = {} GeV and R = {} m".format(
+            args['--energy'], args['--distance']))
     plt.ylim([float(args['--ymin']), float(args['--ymax'])])
     plt.ylabel(r"$\frac{dP}{dt}$ / (npe/ns)")
     plt.xlabel(r"$\Delta$t / ns")
