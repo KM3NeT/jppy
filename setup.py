@@ -40,11 +40,11 @@ ext_modules = [
         include_dirs=[
             get_pybind_include(),
             get_pybind_include(user=True),
-            # get_root_flags("inc"),
+            get_root_flags("inc"),
             get_jpp_include()
         ],
-        # library_dirs=[get_root_flags("lib")],
-        # libraries=["MathCore"],
+        library_dirs=[get_root_flags("lib")],
+        libraries=["MathCore"],
         language='c++')
 ]
 
