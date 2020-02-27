@@ -10,8 +10,8 @@ The jppy Python package
 This software provides Python access to functionalities in Jpp, like accessing
 PDF functions.
 
-It currently depends on a few Jpp headers (no Jpp compilation needed) and on
-ROOT ``TMath`` (a compiled ROOT installation is needed).
+It currently depends on a few Jpp headers (no Jpp compilation needed), make
+sure the ``$JPP_DIR`` is pointing to the Jpp directory.
 
 **Note:** Beware that this package is WIP!
 
@@ -24,7 +24,14 @@ contains the latest release of ``jppy``::
 
     module load jpp/master
 
-The package can be installed via ``pip``::
+Before installing manually, make sure the ``$JPP_DIR`` environment variable
+is pointing to the Jpp directory. Only the headers of Jpp are needed,
+no compilation! For the sake of completeness, here is how to do it::
+
+    git clone --recursive git@git.km3net.de:common/jpp.git
+    export JPP_DIR=$(pwd)/jpp
+
+The package can then be installed via ``pip``::
 
     pip install jppy
 
