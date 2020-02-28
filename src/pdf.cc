@@ -10,6 +10,7 @@
 #include "JTools/JElement.hh"
 #include "JTools/JResult.hh"
 #include "JPhysics/JPDFTable.hh"
+#include "JPhysics/JPDFToolkit.hh"
 #include "JPhysics/JPDFTypes.hh"
 #include "JMath/JZero.hh"
 

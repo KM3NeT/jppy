@@ -20,15 +20,6 @@ class get_pybind_include(object):
         return pybind11.get_include(self.user)
 
 
-def get_root_flags(kind):
-    """Retrieve the root flags for kind='inc' or kind'='lib'"""
-    try:
-        return sp.Popen(["root-config", "--{}dir".format(kind)],
-                        stdout=sp.PIPE).communicate()[0].strip().decode()
-    except OSError:
-        return ""
-
-
 def get_jpp_include():
     return os.path.join(os.getenv("JPP_DIR", ""), "software")
 
@@ -40,11 +31,8 @@ ext_modules = [
         include_dirs=[
             get_pybind_include(),
             get_pybind_include(user=True),
-            get_root_flags("inc"),
             get_jpp_include()
         ],
-        library_dirs=[get_root_flags("lib")],
-        libraries=["MathCore"],
         language='c++')
 ]
 
