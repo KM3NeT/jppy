@@ -22,7 +22,7 @@ stages:
 .dependencies_template: &dependencies_template |
   ./scripts/get_jpp.sh
 
-.test_template: &test_template |
+.test_template: &test_definition |
   source venv/bin/activate
   pip install -U pytest
   pytest
