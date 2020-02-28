@@ -49,6 +49,10 @@ or from a local clone::
 Example - Using PDFs
 ====================
 
+.. image:: examples/muon_pdf.gif
+  :width: 400
+  :alt: Interactive Jupyter notebook with muon PDFs
+
 Here is an example how to play around with muon PDFs using the ``jppy`` module
 in Lyon. Notice that ``jppy`` is already installed in the ``jpp/master``
 module::
