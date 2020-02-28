@@ -41,6 +41,7 @@ download-pdfs:
     cache:
       paths:
         - pdfs
+      key: "init-$CI_COMMIT_REF_SLUG"
 
 build-jpp-master-py35:
     image: docker.km3net.de/base/python:3.5
