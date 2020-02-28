@@ -47,14 +47,7 @@ except DistributionNotFound:
 """)
     for module in ext_modules:
         fobj.write("from . import {}\n".format(module.name.split('.')[1]))
-
-
-try:
-    with open("README.rst") as fh:
-        long_description = fh.read()
-except UnicodeDecodeError:
-    long_description = "jppy - Jpp Python Package"
-
+        
 
 # As of Python 3.6, CCompiler has a `has_flag` method.
 # cf http://bugs.python.org/issue26689
@@ -128,7 +121,7 @@ setup(
     url='https://git.km3net.de/km3py/jppy',
     description='Jpp Python Package',
     packages=["jppy"],
-    long_description=long_description,
+    long_description="jppy - Jpp Python Package",
     ext_modules=ext_modules,
     install_requires=['pybind11>=2.4'],
     setup_requires=['pybind11>=2.4', 'setuptools_scm'],
