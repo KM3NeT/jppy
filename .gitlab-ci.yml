@@ -34,7 +34,7 @@ download-pdfs:
     image: docker.km3net.de/base/ci-helper:1
     stage: init
     script:
-        - '[ ! -d "pdfs" ] && mkdir pdfs && cd pdfs && for i in {1..6}; do wget "http://pi1139.physik.uni-erlangen.de/data/latest/J${i}p.dat" ; done'
+        - ./scripts/get_pdfs.sh
     artifacts:
       paths:
         - pdfs
