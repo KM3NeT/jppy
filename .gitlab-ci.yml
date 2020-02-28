@@ -14,21 +14,16 @@ cache:
 
 
 stages:
-    - build
-    - test
-    - doc
-    - release
+  - init
+  - build
+  - test
+  - doc
+  - release
 
 
 .virtualenv_template: &virtualenv_definition |
-  yum install -y epel-release
-  yum install -y python-pip python-devel
-  _CWD=$(pwd) && cd /usr/local/root && source bin/thisroot.sh && cd $_CWD
-  source /Jpp/setenv.sh /Jpp
-  python -V
   pip install -U pip setuptools wheel
-  pip install virtualenv
-  virtualenv venv
+  python -m venv venv
   source venv/bin/activate
   pip install .
 
@@ -39,17 +34,21 @@ stages:
         junit: "reports/junit*.xml"
 
 
-build-jpp-12.1.0:
-    image: docker.km3net.de/jpp:v12-1-0
-    stage: build
+download-pdfs:
+    image: docker.km3net.de/base/ci-helper:1
+    stage: init
     script:
-        - *virtualenv_definition
+        - '[ ! -d "pdfs" ] && mkdir pdfs && cd pdfs && for i in {1..6}; do wget "http://pi1139.physik.uni-erlangen.de/data/latest/J${i}j.dat" ; done'
+    artifacts:
+      paths:
+        - pdfs
 
-build-jpp-latest:
-    image: docker.km3net.de/jpp:latest
+build-jpp-master:
+    image: docker.km3net.de/base/python:3.8
     stage: build
     script:
         - *virtualenv_definition
+        - ls -al pdfs
 
 test-jpp-12.1.0:
     image: docker.km3net.de/jpp:v12-1-0
