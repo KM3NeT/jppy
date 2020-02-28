@@ -46,11 +46,13 @@ build-jpp-master-py35:
     image: docker.km3net.de/base/python:3.5
     stage: build
     script:
+        - echo "CI_COMMIT_REF_SLUG = $CI_COMMIT_REF_SLUG"
         - *dependencies_template
         - *virtualenv_definition
     cache:
       paths:
         - venv
+      key: "py35-$CI_COMMIT_REF_SLUG"
     artifacts:
       paths:
         - venv
@@ -64,6 +66,7 @@ build-jpp-master-py36:
     cache:
       paths:
         - venv
+      key: "py36-$CI_COMMIT_REF_SLUG"
     artifacts:
       paths:
         - venv
@@ -77,6 +80,7 @@ build-jpp-master-py37:
     cache:
       paths:
         - venv
+      key: "py37-$CI_COMMIT_REF_SLUG"
     artifacts:
       paths:
         - venv
@@ -90,6 +94,7 @@ build-jpp-master-py38:
     cache:
       paths:
         - venv
+      key: "py38-$CI_COMMIT_REF_SLUG"
     artifacts:
       paths:
         - venv
