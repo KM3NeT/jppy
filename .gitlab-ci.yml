@@ -15,14 +15,17 @@ stages:
 
 
 .virtualenv_template: &virtualenv_definition |
-  pip install -U pip setuptools wheel
-  [ ! -d 'venv' ] && python -m venv venv
+  ./scripts/create_venv.sh
   source venv/bin/activate
   JPP_DIR=jpp pip install .
 
 .dependencies_template: &dependencies_template |
-  [ ! -d 'jpp' ] && git clone https://$KM3NET_USERNAME:$KM3NET_PASSWORD@git.km3net.de/common/jpp.git
+  ./scripts/get_jpp.sh
 
+.test_template: &test_template |
+  source venv/bin/activate
+  pip install -U pytest
+  pytest
 
 .junit_template: &junit_definition
     artifacts:
@@ -104,13 +107,7 @@ test-jpp-master-py35:
     image: docker.km3net.de/base/python:3.5
     stage: test
     script:
-        - ls -al
-        - ls -al venv
-        - source venv/bin/activate
-        - which python
-        - pip list
-        - pip install -U pytest
-        - pytest
+        - *test_definition
     dependencies:
         - build-jpp-master-py35
         - download-pdfs
@@ -120,13 +117,7 @@ test-jpp-master-py36:
     image: docker.km3net.de/base/python:3.6
     stage: test
     script:
-        - ls -al
-        - ls -al venv
-        - source venv/bin/activate
-        - which python
-        - pip list
-        - pip install -U pytest
-        - pytest
+        - *test_definition
     dependencies:
         - build-jpp-master-py36
         - download-pdfs
@@ -136,13 +127,7 @@ test-jpp-master-py37:
     image: docker.km3net.de/base/python:3.7
     stage: test
     script:
-        - ls -al
-        - ls -al venv
-        - source venv/bin/activate
-        - which python
-        - pip list
-        - pip install -U pytest
-        - pytest
+        - *test_definition
     dependencies:
         - build-jpp-master-py37
         - download-pdfs
@@ -152,13 +137,7 @@ test-jpp-master-py38:
     image: docker.km3net.de/base/python:3.8
     stage: test
     script:
-        - ls -al
-        - ls -al venv
-        - source venv/bin/activate
-        - which python
-        - pip list
-        - pip install -U pytest
-        - pytest
+        - *test_definition
     dependencies:
         - build-jpp-master-py38
         - download-pdfs
