@@ -39,7 +39,12 @@ ext_modules = [
 # Populating the __init__.py with submodule imports, so that one can import
 # the package and use the submodules directly with the dot-sytax.
 with open("jppy/__init__.py", "w") as fobj:
-    fobj.write("from .version import version\n")
+    fobj.write("""from pkg_resources import get_distribution, DistributionNotFound
+try:
+    version = get_distribution(__name__).version
+except DistributionNotFound:
+    version = "unknown version"
+""")
     for module in ext_modules:
         fobj.write("from . import {}\n".format(module.name.split('.')[1]))
 

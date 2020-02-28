@@ -9,7 +9,6 @@ variables:
 cache:
   paths:
     - .cache/pip
-    - venv/
   key: "$CI_COMMIT_REF_SLUG"
 
 
@@ -23,9 +22,12 @@ stages:
 
 .virtualenv_template: &virtualenv_definition |
   pip install -U pip setuptools wheel
-  python -m venv venv
+  [ ! -d 'venv' ] && python -m venv venv
   source venv/bin/activate
-  pip install .
+  JPP_DIR=jpp pip install .
+
+.dependencies_template: &dependencies_template |
+  [ ! -d 'jpp' ] && git clone https://$KM3NET_USERNAME:$KM3NET_PASSWORD@git.km3net.de/common/jpp.git
 
 
 .junit_template: &junit_definition
@@ -38,45 +40,128 @@ download-pdfs:
     image: docker.km3net.de/base/ci-helper:1
     stage: init
     script:
-        - '[ ! -d "pdfs" ] && mkdir pdfs && cd pdfs && for i in {1..6}; do wget "http://pi1139.physik.uni-erlangen.de/data/latest/J${i}j.dat" ; done'
+        - '[ ! -d "pdfs" ] && mkdir pdfs && cd pdfs && for i in {1..6}; do wget "http://pi1139.physik.uni-erlangen.de/data/latest/J${i}p.dat" ; done'
     artifacts:
       paths:
         - pdfs
+    cache:
+      paths:
+        - pdfs
 
-build-jpp-master:
+build-jpp-master-py35:
+    image: docker.km3net.de/base/python:3.5
+    stage: build
+    script:
+        - *dependencies_template
+        - *virtualenv_definition
+    cache:
+      paths:
+        - venv
+    artifacts:
+      paths:
+        - venv
+
+build-jpp-master-py36:
+    image: docker.km3net.de/base/python:3.6
+    stage: build
+    script:
+        - *dependencies_template
+        - *virtualenv_definition
+    cache:
+      paths:
+        - venv
+    artifacts:
+      paths:
+        - venv
+        
+build-jpp-master-py37:
+    image: docker.km3net.de/base/python:3.7
+    stage: build
+    script:
+        - *dependencies_template
+        - *virtualenv_definition
+    cache:
+      paths:
+        - venv
+    artifacts:
+      paths:
+        - venv
+        
+build-jpp-master-py38:
     image: docker.km3net.de/base/python:3.8
     stage: build
     script:
+        - *dependencies_template
         - *virtualenv_definition
-        - ls -al pdfs
-
-test-jpp-12.1.0:
-    image: docker.km3net.de/jpp:v12-1-0
+    cache:
+      paths:
+        - venv
+    artifacts:
+      paths:
+        - venv
+        
+test-jpp-master-py35:
+    image: docker.km3net.de/base/python:3.5
     stage: test
     script:
-        - *virtualenv_definition
-        - "[ ! -d 'pdfs' ] && mkdir pdfs && JMakePDF.sh -W $(pwd)/pdfs -w http://pi1139.physik.uni-erlangen.de/data/latest/ -C"
+        - ls -al
+        - ls -al venv
+        - source venv/bin/activate
+        - which python
+        - pip list
         - pip install -U pytest
         - pytest
-    cache:
-        paths:
-            - pdfs/
+    dependencies:
+        - build-jpp-master-py35
+        - download-pdfs
 
-test-jpp-latest:
-    image: docker.km3net.de/jpp:latest
+test-jpp-master-py36:
+    image: docker.km3net.de/base/python:3.6
     stage: test
     script:
-        - *virtualenv_definition
-        - "[ ! -d 'pdfs' ] && mkdir pdfs && JMakePDF.sh -W $(pwd)/pdfs -w http://pi1139.physik.uni-erlangen.de/data/latest/ -C"
+        - ls -al
+        - ls -al venv
+        - source venv/bin/activate
+        - which python
+        - pip list
         - pip install -U pytest
         - pytest
-    cache:
-        paths:
-            - pdfs/
+    dependencies:
+        - build-jpp-master-py36
+        - download-pdfs
 
+test-jpp-master-py37:
+    image: docker.km3net.de/base/python:3.7
+    stage: test
+    script:
+        - ls -al
+        - ls -al venv
+        - source venv/bin/activate
+        - which python
+        - pip list
+        - pip install -U pytest
+        - pytest
+    dependencies:
+        - build-jpp-master-py37
+        - download-pdfs
+
+test-jpp-master-py38:
+    image: docker.km3net.de/base/python:3.8
+    stage: test
+    script:
+        - ls -al
+        - ls -al venv
+        - source venv/bin/activate
+        - which python
+        - pip list
+        - pip install -U pytest
+        - pytest
+    dependencies:
+        - build-jpp-master-py38
+        - download-pdfs
 
 pages:
-    image: docker.km3net.de/base/python:3.6
+    image: docker.km3net.de/base/python:3.8
     stage: doc
     script:
         - pip install -U sphinx
@@ -91,9 +176,8 @@ pages:
         - tags
         - master
 
-
 pypi:
-    image: docker.km3net.de/base/python:3
+    image: docker.km3net.de/base/python:3.8
     stage: release
     cache: {}
     script:
