@@ -1,4 +1,4 @@
-#!/bin/bin/env bash
+#!/usr/bin/env bash
 if [ ! -d "pdfs" ]; then
     echo "Retrieving PDFs..."
     mkdir pdfs
