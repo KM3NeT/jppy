@@ -108,7 +108,8 @@ test-jpp-master-py35:
     dependencies:
         - build-jpp-master-py35
         - download-pdfs
-
+    cache: {}
+    
 test-jpp-master-py36:
     image: docker.km3net.de/base/python:3.6
     stage: test
@@ -123,7 +124,8 @@ test-jpp-master-py36:
     dependencies:
         - build-jpp-master-py36
         - download-pdfs
-
+    cache: {}
+    
 test-jpp-master-py37:
     image: docker.km3net.de/base/python:3.7
     stage: test
@@ -138,7 +140,8 @@ test-jpp-master-py37:
     dependencies:
         - build-jpp-master-py37
         - download-pdfs
-
+    cache: {}
+    
 test-jpp-master-py38:
     image: docker.km3net.de/base/python:3.8
     stage: test
@@ -153,7 +156,8 @@ test-jpp-master-py38:
     dependencies:
         - build-jpp-master-py38
         - download-pdfs
-
+    cache: {}
+    
 pages:
     image: docker.km3net.de/base/python:3.8
     stage: doc
