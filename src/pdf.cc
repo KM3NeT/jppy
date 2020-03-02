@@ -295,7 +295,7 @@ PYBIND11_MODULE(pdf, m) {
              py::arg("TTS"),
              py::arg("number_of_points") = 25,
              py::arg("epsilon") = 1e-10)
-        .def("calculate", &JMuonPDF_t::calculate,
+        .def("calculate", &JShowerPDF_t::calculate,
              py::arg("E"),
              py::arg("D"),
              py::arg("cd"),
