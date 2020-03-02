@@ -3,6 +3,10 @@ Unreleased changes
 
 Version 3
 ---------
+3.2 / 2020-03-02
+~~~~~~~~~~~~~~~~
+* shower PDF functionality added (``jppy.pdf.JShowerPDF``)
+
 3.1 / 2020-02-28
 ~~~~~~~~~~~~~~~~
 * removed ROOT dependency. ``jppy`` now only depends on a few Jpp headers
