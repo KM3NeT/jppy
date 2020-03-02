@@ -240,12 +240,12 @@ struct JShowerPDF_t {
    * \param  t1                 arrival time relative to Cherenkov hypothesis [ns]
    * \return                    hypothesis value
    */
-  result_type calculate()(const double E,
-			 const double D,
-			 const double cd,
-			 const double theta,
-			 const double phi,
-			 const double t1) const
+  result_type calculate(const double E,
+			const double D,
+			const double cd,
+			const double theta,
+			const double phi,
+			const double t1) const
   {
     using namespace JPP;
 
