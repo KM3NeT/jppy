@@ -289,7 +289,7 @@ PYBIND11_MODULE(pdf, m) {
              py::arg("phi"),
              py::arg("t1")
             ),
-    py::class_<JShoweverPDF_t>(m, "JShoweerPDF")
+    py::class_<JShowerPDF_t>(m, "JShowerPDF")
         .def(py::init<const std::string &, double, int, double>(),
              py::arg("file_descriptor"),
              py::arg("TTS"),
