@@ -30,6 +30,13 @@ no compilation! For the sake of completeness, here is how to do it::
 
     git clone --recursive git@git.km3net.de:common/jpp.git
     export JPP_DIR=$(pwd)/jpp
+    
+You also need the ``pybind11`` headers and on some Linux also the
+``python-dev`` package::
+
+    brew install pybind11                      # macOS
+    sudo pacman -S pybind11                    # Arch based Linux
+    sudo apt-get install pybind11 python3-dev  # Debian based Linux (e.g. Ubuntu)
 
 The package can then be installed via ``pip``::
 
