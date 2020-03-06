@@ -3,6 +3,10 @@ Unreleased changes
 
 Version 3
 ---------
+3.2.2 / 2020-03-06
+~~~~~~~~~~~~~~~~~~
+* Binary wheel release on PyPI for macOS 10.15 and Linux
+
 3.2.1 / 2020-03-05
 ~~~~~~~~~~~~~~~~~~
 * c++17 support removed in favour of macOS compatibility
