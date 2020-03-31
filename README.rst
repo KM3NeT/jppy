@@ -8,7 +8,7 @@ The jppy Python package
     :target: https://km3py.pages.km3net.de/jppy
 
 This software provides Python access to functionalities in Jpp, like accessing
-PDF functions.
+PDF and NPE functions.
 
 It currently depends on a few Jpp headers (no Jpp compilation needed), make
 sure the ``$JPP_DIR`` is pointing to the Jpp directory.

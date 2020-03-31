@@ -26,14 +26,14 @@ def get_jpp_include():
 
 ext_modules = [
     Extension(
-        'jppy.pdf',
-        ['src/pdf.cc'],
+        'jppy.{}'.format(module),
+        ['src/{}.cc'.format(module)],
         include_dirs=[
             get_pybind_include(),
             get_pybind_include(user=True),
             get_jpp_include()
         ],
-        language='c++')
+        language='c++') for module in ['pdf', 'npe']
 ]
 
 # Populating the __init__.py with submodule imports, so that one can import
