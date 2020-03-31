@@ -3,6 +3,11 @@ Unreleased changes
 
 Version 3
 ---------
+3.3.0 / 2020-03-31
+~~~~~~~~~~~~~~~~~~
+* Add the ``jppy.npe`` module which provides access to NPE tables in Jpp.
+  The two new classes are ``JMuonNPE`` and ``JShowerNPE``.
+
 3.2.2 / 2020-03-06
 ~~~~~~~~~~~~~~~~~~
 * Binary wheel release on PyPI for macOS 10.15 and Linux
