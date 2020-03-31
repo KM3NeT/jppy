@@ -7,11 +7,8 @@ namespace py = pybind11;
 PYBIND11_MODULE(npe, m) {
     m.doc() = "NPE utilities";
     py::class_<JMuonNPE_t>(m, "JMuonNPE")
-        .def(py::init<const std::string &, double, int, double>(),
-             py::arg("file_descriptor"),
-             py::arg("TTS"),
-             py::arg("number_of_points") = 25,
-             py::arg("epsilon") = 1e-10)
+        .def(py::init<const std::string &>(),
+             py::arg("file_descriptor"))
         .def("calculate", &JMuonNPE_t::calculate,
              py::arg("E"),
              py::arg("R"),
