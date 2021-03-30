@@ -6,6 +6,19 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(pdf, m) {
     m.doc() = "PDF utilities";
+    py::class_<JPDF>(m, "JSinglePDF")
+        .def(py::init<const std::string &, double, int, double>(),
+             py::arg("file_descriptor"),
+             py::arg("TTS"),
+             py::arg("number_of_points") = 25,
+             py::arg("epsilon") = 1e-10)
+        .def("calculate", &JPDF::calculate,
+             py::arg("E"),
+             py::arg("R"),
+             py::arg("theta"),
+             py::arg("phi"),
+             py::arg("t1")
+            ),
     py::class_<JMuonPDF_t>(m, "JMuonPDF")
         .def(py::init<const std::string &, double, int, double>(),
              py::arg("file_descriptor"),
