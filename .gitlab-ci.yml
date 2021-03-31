@@ -43,20 +43,6 @@ download-pdfs:
         - pdfs
       key: "init-$CI_COMMIT_REF_SLUG"
 
-build-jpp-master-py35:
-    image: docker.km3net.de/base/python:3.5
-    stage: build
-    script:
-        - echo "CI_COMMIT_REF_SLUG = $CI_COMMIT_REF_SLUG"
-        - *virtualenv_definition
-    cache:
-      paths:
-        - venv
-      key: "py35-$CI_COMMIT_REF_SLUG"
-    artifacts:
-      paths:
-        - venv
-
 build-jpp-master-py36:
     image: docker.km3net.de/base/python:3.6
     stage: build
@@ -96,16 +82,6 @@ build-jpp-master-py38:
       paths:
         - venv
         
-test-jpp-master-py35:
-    image: docker.km3net.de/base/python:3.5
-    stage: test
-    script:
-        - *test_definition
-    dependencies:
-        - build-jpp-master-py35
-        - download-pdfs
-    cache: {}
-    
 test-jpp-master-py36:
     image: docker.km3net.de/base/python:3.6
     stage: test
