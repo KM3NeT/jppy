@@ -3,6 +3,11 @@ Unreleased changes
 
 Version 3
 ---------
+3.4.0 / 2021-03-31
+~~~~~~~~~~~~~~~~~~
+* Added access to ``JPDF`` to (``jppy.pdf.JSinglePDF``) which can be used
+  to access single, or a subset of PDF files
+
 3.3.0 / 2020-03-31
 ~~~~~~~~~~~~~~~~~~
 * Add the ``jppy.npe`` module which provides access to NPE tables in Jpp.
