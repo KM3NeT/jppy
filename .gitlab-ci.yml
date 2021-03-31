@@ -17,10 +17,7 @@ stages:
 .virtualenv_template: &virtualenv_definition |
   ./scripts/create_venv.sh
   source venv/bin/activate
-  JPP_DIR=jpp pip install .
-
-.dependencies_template: &dependencies_template |
-  ./scripts/get_jpp.sh
+  pip install .
 
 .test_template: &test_definition |
   source venv/bin/activate
@@ -46,26 +43,10 @@ download-pdfs:
         - pdfs
       key: "init-$CI_COMMIT_REF_SLUG"
 
-build-jpp-master-py35:
-    image: docker.km3net.de/base/python:3.5
-    stage: build
-    script:
-        - echo "CI_COMMIT_REF_SLUG = $CI_COMMIT_REF_SLUG"
-        - *dependencies_template
-        - *virtualenv_definition
-    cache:
-      paths:
-        - venv
-      key: "py35-$CI_COMMIT_REF_SLUG"
-    artifacts:
-      paths:
-        - venv
-
 build-jpp-master-py36:
     image: docker.km3net.de/base/python:3.6
     stage: build
     script:
-        - *dependencies_template
         - *virtualenv_definition
     cache:
       paths:
@@ -79,7 +60,6 @@ build-jpp-master-py37:
     image: docker.km3net.de/base/python:3.7
     stage: build
     script:
-        - *dependencies_template
         - *virtualenv_definition
     cache:
       paths:
@@ -93,7 +73,6 @@ build-jpp-master-py38:
     image: docker.km3net.de/base/python:3.8
     stage: build
     script:
-        - *dependencies_template
         - *virtualenv_definition
     cache:
       paths:
@@ -103,16 +82,6 @@ build-jpp-master-py38:
       paths:
         - venv
         
-test-jpp-master-py35:
-    image: docker.km3net.de/base/python:3.5
-    stage: test
-    script:
-        - *test_definition
-    dependencies:
-        - build-jpp-master-py35
-        - download-pdfs
-    cache: {}
-    
 test-jpp-master-py36:
     image: docker.km3net.de/base/python:3.6
     stage: test
