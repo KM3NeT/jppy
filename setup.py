@@ -21,7 +21,10 @@ class get_pybind_include(object):
 
 
 def get_jpp_include():
-    return os.path.join(os.getenv("JPP_DIR", ""), "software")
+    jpp_dir = os.getenv("JPP_DIR")
+    if jpp_dir:
+        return os.path.join(jpp_dir, "software")
+    return "jpp"
 
 
 ext_modules = [
