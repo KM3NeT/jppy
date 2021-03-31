@@ -19,9 +19,6 @@ stages:
   source venv/bin/activate
   JPP_DIR=jpp pip install .
 
-.dependencies_template: &dependencies_template |
-  ./scripts/get_jpp.sh
-
 .test_template: &test_definition |
   source venv/bin/activate
   pip install -U pytest
@@ -51,7 +48,6 @@ build-jpp-master-py35:
     stage: build
     script:
         - echo "CI_COMMIT_REF_SLUG = $CI_COMMIT_REF_SLUG"
-        - *dependencies_template
         - *virtualenv_definition
     cache:
       paths:
@@ -65,7 +61,6 @@ build-jpp-master-py36:
     image: docker.km3net.de/base/python:3.6
     stage: build
     script:
-        - *dependencies_template
         - *virtualenv_definition
     cache:
       paths:
@@ -79,7 +74,6 @@ build-jpp-master-py37:
     image: docker.km3net.de/base/python:3.7
     stage: build
     script:
-        - *dependencies_template
         - *virtualenv_definition
     cache:
       paths:
@@ -93,7 +87,6 @@ build-jpp-master-py38:
     image: docker.km3net.de/base/python:3.8
     stage: build
     script:
-        - *dependencies_template
         - *virtualenv_definition
     cache:
       paths:
