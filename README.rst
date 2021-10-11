@@ -10,11 +10,9 @@ The jppy Python package
 This software provides Python access to functionalities in Jpp, like accessing
 PDF and NPE functions.
 
-It currently depends on a few Jpp headers (no Jpp compilation needed), make
-sure the ``$JPP_DIR`` is pointing to the Jpp directory.
-
-**Note:** Beware that this package is WIP!
-
+It currently depends on a few Jpp headers (no Jpp compilation needed), which are
+bundled with the package. However, if you want to use another (newer) Jpp version,
+make sure the ``$JPP_DIR`` is pointing to the Jpp directory.
 
 Installation
 ============
