@@ -4,7 +4,7 @@ The jppy Python package
 .. image:: https://git.km3net.de/km3py/jppy/badges/master/pipeline.svg
     :target: https://git.km3net.de/km3py/jppy/pipelines
 
-.. image:: https://examples.pages.km3net.de/km3badges/docs-latest-brightgreen.svg
+.. image:: https://git.km3net.de/examples/km3badges/-/raw/master/docs-latest-brightgreen.svg
     :target: https://km3py.pages.km3net.de/jppy
 
 This software provides Python access to functionalities in Jpp, like accessing
@@ -25,8 +25,10 @@ contains the latest release of ``jppy``::
     module load jpp/master
 
 Before installing manually, make sure the ``$JPP_DIR`` environment variable
-is pointing to the Jpp directory. Only the headers of Jpp are needed,
-no compilation! For the sake of completeness, here is how to do it::
+is pointing to the Jpp directory otherwise it will use some older Jpp headers
+for compilation. Please note that only the headers of Jpp are needed,
+it is not necessary to compile the whole Jpp framework!
+For the sake of completeness, here is how to do it::
 
     git clone --recursive git@git.km3net.de:common/jpp.git
     export JPP_DIR=$(pwd)/jpp
