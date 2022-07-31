@@ -1,12 +1,27 @@
-*.so
+# Byte-compiled / optimized / DLL files
+__pycache__/
 *.py[cod]
-*.egg-info
+*.pyxbldc
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+venv/
+dist/
 _build
 _generate
-build
-venv
-jppy/__init__.py
-jppy/version.py
 pip-wheel-metadata
-scratch
-pdfs
+*.egg-info
+*.egg
+
+# Version info
+src/jppy/version.py
+
+# Temporary folders and meta-data
+tmp/
+
+# Data folders
+pdfs/
+
