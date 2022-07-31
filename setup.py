@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
@@ -19,38 +20,13 @@ class get_pybind_include(object):
         import pybind11
         return pybind11.get_include(self.user)
 
-
+    
 def get_jpp_include():
     jpp_dir = os.getenv("JPP_DIR")
     if jpp_dir:
         return os.path.join(jpp_dir, "software")
-    return "jpp"
+    return "src/jpp"
 
-
-ext_modules = [
-    Extension(
-        'jppy.{}'.format(module),
-        ['src/{}.cc'.format(module)],
-        include_dirs=[
-            get_pybind_include(),
-            get_pybind_include(user=True),
-            get_jpp_include()
-        ],
-        language='c++') for module in ['pdf', 'npe']
-]
-
-# Populating the __init__.py with submodule imports, so that one can import
-# the package and use the submodules directly with the dot-sytax.
-with open("jppy/__init__.py", "w") as fobj:
-    fobj.write("""from pkg_resources import get_distribution, DistributionNotFound
-try:
-    version = get_distribution(__name__).version
-except DistributionNotFound:
-    version = "unknown version"
-""")
-    for module in ext_modules:
-        fobj.write("from . import {}\n".format(module.name.split('.')[1]))
-        
 
 # As of Python 3.6, CCompiler has a `has_flag` method.
 # cf http://bugs.python.org/issue26689
@@ -117,18 +93,23 @@ class BuildExt(build_ext):
         build_ext.build_extensions(self)
 
 
-setup(
-    name='jppy',
-    author='Tamas Gal',
-    author_email='tgal@km3net.de',
-    url='https://git.km3net.de/km3py/jppy',
-    description='Jpp Python Package',
-    packages=["jppy"],
-    long_description="jppy - Jpp Python Package",
-    ext_modules=ext_modules,
-    install_requires=['pybind11>=2.4'],
-    setup_requires=['pybind11>=2.4', 'setuptools_scm'],
-    use_scm_version=True,
-    cmdclass={'build_ext': BuildExt},
-    zip_safe=False,
-)
+if __name__ == '__main__':    
+
+    setup_args = dict(
+        ext_modules = [
+            Extension(
+                'jppy.{}'.format(module),
+                ['src/jppy/{}.cc'.format(module)],
+                include_dirs=[
+                    get_pybind_include(),
+                    get_pybind_include(user=True),
+                    get_jpp_include()
+                ],
+                language='c++') for module in ['constants', 'geane', 'pdf', 'npe']
+        ],
+        cmdclass = dict(
+            build_ext = BuildExt
+        )
+    )
+
+    setup(**setup_args)

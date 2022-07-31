@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export URL="http://pi1139.physik.uni-erlangen.de/data/latest"
+export URL="http://sftp.km3net.de/data/latest/"
 if [ ! -d "pdfs" ]; then
     echo "Retrieving PDFs..."
     mkdir pdfs
