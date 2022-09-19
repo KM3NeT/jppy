@@ -11,7 +11,7 @@ class TestMuonPDFEvaluator(unittest.TestCase):
         self.assertAlmostEqual( 0.00388579021, result.f)
         self.assertAlmostEqual(-0.000739757, result.fp)
         self.assertAlmostEqual(0.035047945, result.v)
-        self.assertAlmostEqual( 0.097171157, result.V)
+        self.assertAlmostEqual(0.09606971431, result.V)
 
 class TestShowerPDFEvaluator(unittest.TestCase):
     def test_pdf_evaluator(self):
@@ -20,8 +20,5 @@ class TestShowerPDFEvaluator(unittest.TestCase):
         result = shower_pdf.evaluate(D, cd, theta, phi, t_obs)
         self.assertAlmostEqual(0.006247665, result.f)
         self.assertAlmostEqual(0.0006429129, result.fp)
-        self.assertAlmostEqual(0.013960066, result.v)
-        self.assertAlmostEqual(0.296589983, result.V)
-
-
-    
+        self.assertAlmostEqual(0.01406847423, result.v)
+        self.assertAlmostEqual(0.297769976, result.V)
