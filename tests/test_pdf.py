@@ -8,7 +8,7 @@ class TestMuonPDF(unittest.TestCase):
         muon_pdf = jppy.pdf.JMuonPDF(PDFS, 0)
         result = muon_pdf.calculate(10, 5, 0, 0, 23)
         self.assertAlmostEqual(0.00067762789, result.f)
-        self.assertAlmostEqual(-1.9661888268, result.fp)
+        self.assertAlmostEqual(-1.96618882684, result.fp)
         self.assertAlmostEqual(0.022764524, result.v)
         self.assertAlmostEqual(0.115814468, result.V)
 
@@ -17,6 +17,6 @@ class TestShowerPDF(unittest.TestCase):
         shower_pdf = jppy.pdf.JShowerPDF(PDFS, 0)
         result = shower_pdf.calculate(100, 10, 0.1, 0.2, 0.3, 6)
         self.assertAlmostEqual(0.0013937540, result.f)
-        self.assertAlmostEqual(5.1614638414, result.fp)
+        self.assertAlmostEqual(5.16146384141, result.fp)
         self.assertAlmostEqual(0.010475308, result.v)
         self.assertAlmostEqual(0.149635554, result.V)
