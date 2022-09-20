@@ -32,7 +32,7 @@ namespace JMATH {
   
   
   /**
-   * Power \f$x^y\f$.
+   * Power \f$ x^{y} \f$.
    *
    * \param  x              value
    * \param  y              power
@@ -54,7 +54,7 @@ namespace JMATH {
 
   private:
     /**
-     * Power \f$x^y\f$.
+     * Power \f$ x^{y} \f$.
      * This method corresponds to primitive data types.
      *
      * \param  x              value
@@ -70,8 +70,8 @@ namespace JMATH {
 
 
     /**
-     * Power \f$x^y\f$.
-     * Power.
+     * Power \f$ x^{y} \f$.
+     *
      * This method corresponds to non-primitive data types.
      *
      * \param  x              value
@@ -88,7 +88,7 @@ namespace JMATH {
 
 
   /**
-   * Power \f$x^y\f$.
+   * Power \f$ x^{y} \f$.
    *
    * \param  x              value
    * \param  y              power
@@ -296,7 +296,7 @@ namespace JMATH {
      */
     friend T& operator*=(T& first, const T& second)
     {
-      return first.mul(second);
+      return static_cast<JMath<T>&>(first).mul(second);
     }
 
     
@@ -483,7 +483,7 @@ namespace JMATH {
    * Template definition so that compiler error is generated if implementation is missing (see JEigen3D.hh).
    */
   template<>
-  class JAverage<JGEOMETRY3D::JQuaternion3D>;
+  struct JAverage<JGEOMETRY3D::JQuaternion3D>;
 
 
   /**

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export URL="http://sftp.km3net.de/data/latest/"
+export URL="https://sftp.km3net.de/data/v17.0.0/"
 if [ ! -d "pdfs" ]; then
     echo "Retrieving PDFs..."
     mkdir pdfs
