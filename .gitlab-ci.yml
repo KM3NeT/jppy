@@ -134,6 +134,7 @@ pypi:
     cache: {}
     script:
         - pip install -U twine setuptools setuptools_scm
+        - pip install .
         - python setup.py sdist
         - twine upload dist/*
     only:
