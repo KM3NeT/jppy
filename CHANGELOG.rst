@@ -3,6 +3,10 @@ Unreleased changes
 
 Version 3
 ---------
+3.4.1 / 2022-10-17
+~~~~~~~~~~~~~~~~~~
+* Fixed installation issue on macOS
+
 3.4.0 / 2021-03-31
 ~~~~~~~~~~~~~~~~~~
 * Added access to ``JPDF`` to (``jppy.pdf.JSinglePDF``) which can be used
