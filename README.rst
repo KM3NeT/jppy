@@ -60,9 +60,8 @@ Example - Using PDFs
   :width: 400
   :alt: Interactive Jupyter notebook with muon PDFs
 
-The latest PDF data files can be downloaded from
-`http://sftp.km3net.de/data/latest/`_. In CC Lyon, these files are stored in
-``$JPP_DIR/data``.
+The latest PDF data files can be downloaded from `the KM3NeT SFTP Server <http://sftp.km3net.de/data/latest/>`_.
+In CC Lyon, these files are stored in ``$JPP_DIR/data``.
 
 Here is an example how to play around with muon PDFs using the ``jppy`` module
 in Lyon. Notice that ``jppy`` is already installed in the ``jpp/master``
