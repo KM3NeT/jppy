@@ -3,6 +3,10 @@ Unreleased changes
 
 Version 3
 ---------
+3.5.0 / 2022-11-07
+~~~~~~~~~~~~~~~~~~
+* ``JOscProb`` tools and lots of related functionalities has been added
+
 3.4.1 / 2022-10-17
 ~~~~~~~~~~~~~~~~~~
 * Fixed installation issue on macOS
