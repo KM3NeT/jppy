@@ -3,6 +3,7 @@
 
 #include "JTools/JGridCollection.hh"
 #include "JTools/JMapCollection.hh"
+#include "JTools/JElement.hh"
 
 
 /**

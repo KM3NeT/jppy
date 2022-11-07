@@ -8,6 +8,7 @@
 #include <map>
 
 #include "JLang/gzstream.h"
+#include "JLang/JException.hh"
 
 
 /**
@@ -25,6 +26,8 @@ namespace JPP { using namespace JEEP; }
 
 namespace JEEP {
 
+  using JLANG::JNoValue;
+
   /**
    * Nick names of environment variables.
    */
@@ -38,6 +41,43 @@ namespace JEEP {
   static const char        FILENAME_SEPARATOR   = '.';                //!< file name separator
   static const char* const TYPENAME_SEPARATOR   = "::";               //!< type name separator
   static const char        PROTOCOL_SEPARATOR   = ':';                //!< protocol  separator
+  static const char        FILENAME_WILD_CARD   = '%';                //!< wild card character for file name substitution
+
+
+  /**
+   * Check presence of wild card.
+   *
+   * \param  file_name         file name
+   * \return                   true if wild card present; else false
+   */
+  inline bool hasWildCard(const std::string& file_name)
+  {
+    return (file_name.find(FILENAME_WILD_CARD) != std::string::npos);
+  }
+
+
+  /**
+   * Get file name by setting wild card to given value.
+   *
+   * \param  file_name          input  file name
+   * \param  value              value
+   * \return                    output file name
+   */
+  inline std::string setWildCard(const std::string& file_name, const std::string& value)
+  {
+    using namespace std;
+    using namespace JPP;
+
+    string buffer = file_name;
+
+    string::size_type pos = buffer.find(FILENAME_WILD_CARD);
+
+    if (pos == string::npos) {
+      THROW(JNoValue, "Method getFilename(): Missing wild card character \'" << FILENAME_WILD_CARD << "\'.");
+    }
+
+    return buffer.replace(pos, 1, value);
+  }
 
 
   /**

@@ -8,6 +8,7 @@
 #include "JLang/JException.hh"
 #include "JLang/JAssert.hh"
 #include "JLang/JBool.hh"
+#include "JLang/JStreamAvailable.hh"
 #include "JTools/JFunctional.hh"
 #include "JTools/JDistance.hh"
 #include "JTools/JResult.hh"
@@ -96,69 +97,80 @@ namespace JTOOLS {
      */
     virtual result_type evaluate(const argument_type* pX) const override 
     {
-      if (this->size() <= 1u) {
-        return this->getExceptionHandler().action(JFunctionalException("JPolintFunction<>::evaluate() not enough data."));
-      }
-
       const argument_type x = *pX;
 
-      const_iterator p = this->lower_bound(x);
-
-      if ((p == this->begin() && this->getDistance(x, (p++)->getX()) > distance_type::precision) ||
-          (p == this->end()   && this->getDistance((--p)->getX(), x) > distance_type::precision)) {
-        return this->getExceptionHandler().action(JValueOutOfRange("JPolintFunction::evaluate() x out of range."));
-      }
-
-      ++pX;  // next argument value
-
-
-      const int n = std::min((int) (N + 1), (int) this->size());         // number of points to interpolate      
-
-      for (int i = n/2; i != 0 && p != this->end();   --i, ++p) {}       // move p to begin of data
-      for (int i = n  ; i != 0 && p != this->begin(); --i, --p) {}
-
-
-      int j = 0;
-
-      for (int i = 0; i != n; ++p, ++i) {
+      if (this->size() > 1u) {
 	
-	u[i] = this->getDistance(x, p->getX());
-	v[i] = function_type::getValue(p->getY(), pX);
-	w[i] = v[i];
+	const_iterator p = this->lower_bound(x);
 
-	if (fabs(u[i]) < fabs(u[j])) {
-	  j = i;
+	if ((p == this->begin() && this->getDistance(x, (p++)->getX()) > distance_type::precision) ||
+	    (p == this->end()   && this->getDistance((--p)->getX(), x) > distance_type::precision)) {
+
+	  return this->getExceptionHandler().action(MAKE_EXCEPTION(JValueOutOfRange, "abscissa out of range " 
+								   << STREAM("?") << x                      << " <> " 
+								   << STREAM("?") << this->begin() ->getX() << ' '
+								   << STREAM("?") << this->rbegin()->getX()));
 	}
-      }
+
+	++pX;  // next argument value
+
+
+	const int n = std::min((int) (N + 1), (int) this->size());         // number of points to interpolate      
+
+	for (int i = n/2; i != 0 && p != this->end();   --i, ++p) {}       // move p to begin of data
+	for (int i = n  ; i != 0 && p != this->begin(); --i, --p) {}
+
+
+	int j = 0;
+
+	for (int i = 0; i != n; ++p, ++i) {
+	
+	  u[i] = this->getDistance(x, p->getX());
+	  v[i] = function_type::getValue(p->getY(), pX);
+	  w[i] = v[i];
+
+	  if (fabs(u[i]) < fabs(u[j])) {
+	    j = i;
+	  }
+	}
 
       
-      result_type y = v[j];
+	result_type y = v[j];
 
-      --j;
+	--j;
 
-      for (int m = 1; m != n; ++m) {
+	for (int m = 1; m != n; ++m) {
 
-	for (int i = 0; i != n-m; ++i) {
+	  for (int i = 0; i != n-m; ++i) {
 
-	  const double ho = u[ i ];
-	  const double hp = u[i+m];
-	  const double dx = ho - hp;
+	    const double ho = u[ i ];
+	    const double hp = u[i+m];
+	    const double dx = ho - hp;
 
-	  v[i]  = v[i+1];
-	  v[i] -= w[ i ];
-	  w[i]  = v[ i ];
+	    v[i]  = v[i+1];
+	    v[i] -= w[ i ];
+	    w[i]  = v[ i ];
 
-	  v[i] *= ho/dx;
-	  w[i] *= hp/dx;
+	    v[i] *= ho/dx;
+	    w[i] *= hp/dx;
+	  }
+
+	  if (2*(j+1) < n - m)
+	    y += v[j+1];
+	  else
+	    y += w[j--];
 	}
 
-	if (2*(j+1) < n - m)
-	  y += v[j+1];
-	else
-	  y += w[j--];
-      }
+	return y;
+	
+      } else if (this->size() == 1u && this->getDistance(x, this->begin()->getX()) <= distance_type::precision) {
+			
+	return function_type::getValue(this->begin()->getY(), ++pX);
+	
+      } else {
 
-      return y;
+        return this->getExceptionHandler().action(MAKE_EXCEPTION(JFunctionalException, "not enough data " << STREAM("?") << x));	
+      }
     }
 
   protected: 
@@ -227,29 +239,39 @@ namespace JTOOLS {
      */
     virtual result_type evaluate(const argument_type* pX) const override 
     {
-      if (this->size() <= 1u) {
-        return this->getExceptionHandler().action(JFunctionalException("JPolintFunction<>::evaluate() not enough data."));
-      }
-
       const argument_type x = *pX;
 
-      const_iterator p = this->lower_bound(x);
+      if (this->size() > 1u) {
+	
+	const_iterator p = this->lower_bound(x);
 
-      if ((p == this->begin() && this->getDistance(x, (p++)->getX()) > distance_type::precision) ||
-          (p == this->end()   && this->getDistance((--p)->getX(), x) > distance_type::precision)) {
+	if ((p == this->begin() && this->getDistance(x, (p++)->getX()) > distance_type::precision) ||
+	    (p == this->end()   && this->getDistance((--p)->getX(), x) > distance_type::precision)) {
 
-        return this->getExceptionHandler().action(JValueOutOfRange("JPolintFunction::evaluate() x out of range."));
+	  return this->getExceptionHandler().action(MAKE_EXCEPTION(JValueOutOfRange, "abscissa out of range " 
+								   << STREAM("?") << x                      << " <> " 
+								   << STREAM("?") << this->begin() ->getX() << ' '
+								   << STREAM("?") << this->rbegin()->getX()));
+	}
+
+	++pX;  // next argument value
+
+
+	const_iterator q = p--;
+
+	if (q == this->begin() || this->getDistance(x, q->getX()) < this->getDistance(p->getX(), x)) 
+	  return function_type::getValue(q->getY(), pX);
+	else
+	  return function_type::getValue(p->getY(), pX);
+
+      } else if (this->size() == 1u && this->getDistance(x, this->begin()->getX()) <= distance_type::precision) {
+			
+	return function_type::getValue(this->begin()->getY(), ++pX);
+	
+      } else {
+
+        return this->getExceptionHandler().action(MAKE_EXCEPTION(JFunctionalException, "not enough data " << STREAM("?") << x));	
       }
-
-      ++pX;  // next argument value
-
-
-      const_iterator q = p--;
-
-      if (q == this->begin() || this->getDistance(x, q->getX()) < this->getDistance(p->getX(), x)) 
-	return function_type::getValue(q->getY(), pX);
-      else
-	return function_type::getValue(p->getY(), pX);
     }
 
   protected:
@@ -312,38 +334,48 @@ namespace JTOOLS {
      */
     virtual result_type evaluate(const argument_type* pX) const override 
     {
-      if (this->size() <= 1u) {
-        return this->getExceptionHandler().action(JFunctionalException("JPolintFunction<>::evaluate() not enough data."));
-      }
-
       const argument_type x = *pX;
 
-      const_iterator p = this->lower_bound(x);
+      if (this->size() > 1u) {
 
-      if ((p == this->begin() && this->getDistance(x, (p++)->getX()) > distance_type::precision) ||
-          (p == this->end()   && this->getDistance((--p)->getX(), x) > distance_type::precision)) {
+	const_iterator p = this->lower_bound(x);
 
-        return this->getExceptionHandler().action(JValueOutOfRange("JPolintFunction::evaluate() x out of range."));
+	if ((p == this->begin() && this->getDistance(x, (p++)->getX()) > distance_type::precision) ||
+	    (p == this->end()   && this->getDistance((--p)->getX(), x) > distance_type::precision)) {
+
+	  return this->getExceptionHandler().action(MAKE_EXCEPTION(JValueOutOfRange, "abscissa out of range " 
+								   << STREAM("?") << x                      << " <> " 
+								   << STREAM("?") << this->begin() ->getX() << ' '
+								   << STREAM("?") << this->rbegin()->getX()));
+	}
+
+	++pX;  // next argument value
+
+
+	const_iterator q = p--;
+
+	const double dx = this->getDistance(p->getX(), q->getX());
+	const double a  = this->getDistance(x, q->getX()) / dx;
+	const double b  = 1.0 - a;
+
+	ya = function_type::getValue(p->getY(), pX);
+	yb = function_type::getValue(q->getY(), pX);
+
+	ya *= a;
+	yb *= b;
+
+	ya += yb;
+
+	return ya;
+	
+      } else if (this->size() == 1u && this->getDistance(x, this->begin()->getX()) <= distance_type::precision) {
+	
+	return function_type::getValue(this->begin()->getY(), ++pX);
+	
+      } else {
+
+        return this->getExceptionHandler().action(MAKE_EXCEPTION(JFunctionalException, "not enough data " << STREAM("?") << x));	
       }
-
-      ++pX;  // next argument value
-
-
-      const_iterator q = p--;
-
-      const double dx = this->getDistance(p->getX(), q->getX());
-      const double a  = this->getDistance(x, q->getX()) / dx;
-      const double b  = 1.0 - a;
-
-      ya = function_type::getValue(p->getY(), pX);
-      yb = function_type::getValue(q->getY(), pX);
-
-      ya *= a;
-      yb *= b;
-
-      ya += yb;
-
-      return ya;
     }
 
   protected:
@@ -419,11 +451,11 @@ namespace JTOOLS {
      */
     virtual result_type evaluate(const argument_type* pX) const override 
     {
-      if (this->size() <= 1u) {
-        return this->getExceptionHandler().action(JFunctionalException("JPolintFunction<>::evaluate() not enough data."));
-      }
-
       const argument_type x = *pX;
+
+      if (this->size() <= 1u) {
+        return this->getExceptionHandler().action(MAKE_EXCEPTION(JFunctionalException, "not enough data " << STREAM("?") << x));
+      }
 
       const_iterator p = this->lower_bound(x);
 
@@ -431,7 +463,8 @@ namespace JTOOLS {
 
         try {
 
-          result   = this->getExceptionHandler().action(JValueOutOfRange("JPolintFunction<>::operator() x < xmin."));
+          result   = this->getExceptionHandler().action(MAKE_EXCEPTION(JValueOutOfRange, "abscissa out of range " 
+								       << STREAM("?") << x << " < " << STREAM("?") << this->begin() ->getX()));
 
           // overwrite integral values
 
@@ -448,7 +481,8 @@ namespace JTOOLS {
 
         try {
 
-          result   = this->getExceptionHandler().action(JValueOutOfRange("JPolintFunction<>::operator() x > xmax."));
+          result   = this->getExceptionHandler().action(MAKE_EXCEPTION(JValueOutOfRange, "abscissa out of range " 
+								       << STREAM("?") << x << " > " << STREAM("?") << this->rbegin() ->getX()));
 
           // overwrite integral values
 
@@ -640,18 +674,21 @@ namespace JTOOLS {
      */
     result_type evaluate(const argument_type* pX) const
     {
-      if (this->size() <= N) {
-	THROW(JFunctionalException, "JPolintFunction<>::evaluate() not enough data.");
-      }
-
       const argument_type x = *pX;
+
+      if (this->size() <= N) {
+        THROW(JFunctionalException, "not enough data " << STREAM("?") << x);
+      }
 
       const_iterator p = this->lower_bound(x);
 
       if ((p == this->begin() && this->getDistance(x, (p++)->getX()) > distance_type::precision) ||
           (p == this->end()   && this->getDistance((--p)->getX(), x) > distance_type::precision)) {
 
-        THROW(JValueOutOfRange, "JPolintFunction::evaluate() x out of range.");
+        THROW(JValueOutOfRange, "abscissa out of range " 
+	      << STREAM("?") << x                      << " <> " 
+	      << STREAM("?") << this->begin() ->getX() << ' '
+	      << STREAM("?") << this->rbegin()->getX());
       }
 
       ++pX;  // next argument value

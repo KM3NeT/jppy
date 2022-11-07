@@ -7,6 +7,8 @@ except DistributionNotFound:
     
 from . import pdf_evaluator
 from . import constants
+from . import oscprob
 from . import geane
+from . import lang
 from . import pdf
 from . import npe

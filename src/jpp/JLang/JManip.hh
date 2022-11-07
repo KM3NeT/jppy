@@ -5,6 +5,7 @@
 #include <ostream>
 #include <sstream>
 #include <iomanip>
+#include <functional>
 
 
 /**
@@ -712,5 +713,47 @@ inline void setFormat(const JFormat_t& format)
 {
   getFormat<T>() = format;
 }
+
+
+/**
+ * Auxiliary data structure to convert (lambda) function to printable object.
+ *
+ * The (lambda) function should conform with the type definition LAMBDA::function_type.\n
+ * This data structure acts as a simple "wrapper" and should be used if the lambda has capture functionality.
+ */
+struct LAMBDA {
+  /**
+   * Type definition of print function.
+   */
+  typedef std::function<void(std::ostream&)>  function_type;
+
+
+  /**
+   * Constructor.
+   *
+   * \param  f1         (lambda) function
+   */
+  LAMBDA(const function_type& f1) :
+    f1(f1)
+  {}
+
+
+  /**
+   * Write printable object to output stream.
+   *
+   * \param  out        output stream
+   * \param  object     printable object
+   * \return            output stream
+   */
+  friend inline std::ostream& operator<<(std::ostream& out, const LAMBDA& object)
+  {
+    object.f1(out);
+
+    return out;
+  }
+
+private:
+  const function_type& f1;
+};
 
 #endif

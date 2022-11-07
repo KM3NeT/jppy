@@ -355,6 +355,24 @@ namespace JLANG {
 
 
   /**
+   * Exception for recovery of file.
+   */
+  class JFileRecoveryException : 
+    public JException 
+  { 
+  public: 
+    /**
+     * Constructor.
+     *
+     * \param  error    error message
+     */
+    JFileRecoveryException(const std::string& error) :
+      JException(error)
+    {}
+  };
+
+
+  /**
    * Exception for reading of file.
    */
   class JFileReadException : 
@@ -661,13 +679,21 @@ namespace JLANG {
 }
 
 /**
+ * Make exception.
+ *
+ * \param  JException_t    exception
+ * \param  A               message
+ */
+#define MAKE_EXCEPTION(JException_t, A) JException_t(static_cast<std::ostringstream&>(JLANG::JException::getOstream() << __FILE__ << ':' << __LINE__ << std::endl << A).str())
+
+/**
  * Marco for throwing exception with std::ostream compatible message.
  *
  * \param  JException_t    exception
  * \param  A               message
  */
 #ifndef THROW
-#define THROW(JException_t, A) do { throw JException_t(static_cast<std::ostringstream&>(JLANG::JException::getOstream() << __FILE__ << ':' << __LINE__ << std::endl << A).str()); } while(0)
+#define THROW(JException_t, A) do { throw MAKE_EXCEPTION(JException_t, A); } while(0)
 #endif
 
 #endif

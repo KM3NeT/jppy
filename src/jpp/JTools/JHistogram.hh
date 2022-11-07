@@ -51,6 +51,17 @@ namespace JTOOLS {
 
 
     /**
+     * Reset.
+     */
+    void reset()
+    {
+      this->underflow = JMATH::zero;
+      this->overflow  = JMATH::zero;
+      this->integral  = JMATH::zero;
+    }
+
+
+    /**
      * Histogram filling.
      *
      * \param  pX              pointer to abscissa values

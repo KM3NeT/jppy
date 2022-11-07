@@ -7,6 +7,7 @@
 #include "JTools/JArray.hh"
 #include "JTools/JMultiHistogram.hh"
 #include "JTools/JHistogramMap.hh"
+#include "JTools/JHistogram1D.hh"
 
 
 /**
@@ -49,9 +50,8 @@ namespace JTOOLS {
 
     typedef JFunction_t                                                   function_type;
 
-    typedef typename JFunction_t::value_type                              value_type;
-    typedef typename JFunction_t::argument_type                           argument_type;
-    typedef typename JFunction_t::supervisor_type                         supervisor_type;
+    typedef typename function_type::value_type                            value_type;
+    typedef typename function_type::argument_type                         argument_type;
 
     typedef typename multimap_type::abscissa_type                         abscissa_type;
     typedef typename multimap_type::ordinate_type                         ordinate_type;
@@ -65,6 +65,7 @@ namespace JTOOLS {
     typedef typename multimap_type::super_iterator                        super_iterator;
     typedef typename multimap_type::super_const_iterator                  super_const_iterator;
 
+    using JFunctional<abscissa_type, result_type>::setExceptionHandler;
     using multimap_type::insert;
 
 
@@ -116,8 +117,8 @@ namespace JTOOLS {
      *
      * \param  input                multidimensional function
      */
-    template<class JPDF_t, class JPDFMaplist_t, class JPDFDistance_t>    
-    void insert(const JMultiFunction<JPDF_t, JPDFMaplist_t, JPDFDistance_t>& input) 
+    template<class __JFunction_t, class __JMaplist_t, class __JDistance_t>    
+    void insert(const JMultiFunction<__JFunction_t, __JMaplist_t, __JDistance_t>& input) 
     {
       copy(input, *this);
     }
@@ -128,8 +129,8 @@ namespace JTOOLS {
      *
      * \param  input                multidimensional histogram
      */
-    template<class JHistogram_t, class JHistogramMaplist_t, class JHistogramDistance_t>
-    void insert(const JMultiHistogram<JHistogram_t, JHistogramMaplist_t, JHistogramDistance_t>& input)
+    template<class JHistogram_t, class __JMaplist_t, class __JDistance_t>
+    void insert(const JMultiHistogram<JHistogram_t, __JMaplist_t, __JDistance_t>& input)
     {
       this->insert(JMultiKey<0, argument_type>(), input);
     }
@@ -153,7 +154,7 @@ namespace JTOOLS {
      *
      * \param  supervisor      supervisor
      */
-    void setExceptionHandler(const supervisor_type& supervisor)
+    void setExceptionHandler(const typename function_type::supervisor_type& supervisor)
     {
       this->for_each(supervisor);
 
@@ -172,11 +173,15 @@ namespace JTOOLS {
     template<class ...Args>
     result_type operator()(const Args& ...args) const
     {
-      return this->evaluate(JArray<NUMBER_OF_DIMENSIONS, argument_type>(args...).data());
+      buffer.set(args...);
+
+      return this->evaluate(buffer.data());
     }
 
 
   protected:
+    mutable JArray<NUMBER_OF_DIMENSIONS, argument_type> buffer;
+
     /**
      * Insert multidimensional histogram at multidimensional key.
      *
@@ -193,7 +198,7 @@ namespace JTOOLS {
     {
       if (input.size() > 1) {
 
-	for (typename JHistogramMap<__JAbscissa_t, __JContents_t, __JMap_t, __JDistance_t>::const_iterator j = input.begin(), i = j++; j != input.end(); ++i, ++j) {
+	for (auto j = input.begin(), i = j++; j != input.end(); ++i, ++j) {
 	  
 	  const argument_type x = 0.5 * (i->getX() + j->getX());
 
@@ -201,7 +206,7 @@ namespace JTOOLS {
 	}
       }
     }
- 
+
 
     /**
      * Convert one-dimensional histogram to PDF and insert result at given multidimensional key.
@@ -209,9 +214,28 @@ namespace JTOOLS {
      * \param  key                  multidimensional key
      * \param  input                histogram
      */
-    template<class __JValue_t>
-    void insert(const JMultiKey<JMapLength<JMaplist_t>::value, argument_type>& key, 
-		const __JValue_t&                                              input)
+    template<class __JElement_t, template<class, class> class __JContainer_t, class __JDistance_t>
+    void insert(const JMultiKey<JMapLength<JMaplist_t>::value, argument_type>&   key, 
+		const JHistogram1D<__JElement_t, __JContainer_t, __JDistance_t>& input)
+ 
+    {
+      JFunction_t buffer;
+      
+      makePDF(input, buffer);
+      
+      multimap_type::insert(key, buffer);
+    }    
+
+
+    /**
+     * Convert multidimensional histogram to PDF and insert result at given multidimensional key.
+     *
+     * \param  key                  multidimensional key
+     * \param  input                multidimensional histogram
+     */
+    template<class JHistogram_t, class __JMaplist_t, class __JDistance_t>
+    void insert(const JMultiKey<JMapLength<JMaplist_t>::value, argument_type>&    key, 
+		const JMultiHistogram<JHistogram_t, __JMaplist_t, __JDistance_t>& input)
     {
       JFunction_t buffer;
       
@@ -232,7 +256,7 @@ namespace JTOOLS {
            class JDistance_t>
   class JMultiFunction<JConstantFunction1D<JArgument_t, JResult_t>, JMapList<JMap_t>, JDistance_t> :
     public JMap_t<JArgument_t, JResult_t, JDistance_t>,
-    public JFunction1D<JArgument_t, JResult_t>
+    public JFunction1D<JArgument_t, typename JMap_t<JArgument_t, JResult_t, JDistance_t>::result_type>
   {
   public:
 

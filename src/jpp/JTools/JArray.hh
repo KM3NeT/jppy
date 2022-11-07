@@ -59,7 +59,9 @@ namespace JTOOLS {
      * Default constructor.
      */
     JArray()
-    {}
+    {
+      fill(T());
+    }
 
 
     /**
@@ -255,7 +257,7 @@ namespace JTOOLS {
       if (index >= 0 && index < N)
 	return buffer[index];
       else
-	throw JIndexOutOfRange("JArray<>::at()");
+	THROW(JIndexOutOfRange, "invalid index " << 0 << " <= " << index << " < " << N);
     }
     
 
@@ -270,7 +272,7 @@ namespace JTOOLS {
       if (index >= 0 && index < N)
 	return buffer[index];
       else
-	throw JIndexOutOfRange("JArray<>::at()");
+	THROW(JIndexOutOfRange, "invalid index " << 0 << " <= " << index << " < " << N);
     }
 
 
@@ -326,6 +328,19 @@ namespace JTOOLS {
     JArray<N-1, T> pop_back() const
     {
       return JArray<N-1, T>(buffer);
+    }
+
+
+    /**
+     * Fill array.
+     *
+     * \param  value            value
+     */
+    void fill(argument_type value)
+    {
+      for (int i = 0; i != N; ++i) {
+	buffer[i] = value;
+      }
     }
 
 
@@ -659,7 +674,9 @@ namespace JTOOLS {
      * Default constructor.
      */
     JArray()
-    {}
+    {
+      fill(T());
+    }
 
 
     /**
@@ -722,11 +739,11 @@ namespace JTOOLS {
     /**
      * Initialise constructor.
      *
-     * \param  x                value;
+     * \param  value            value;
      */
-    JArray(argument_type x)
+    JArray(argument_type value)
     {
-      buffer[0] = x;
+      buffer[0] = value;
     }
 
 
@@ -778,10 +795,10 @@ namespace JTOOLS {
      */
     const_reference at(int index) const 
     { 
-      if (index >= 0 && index < N)
+      if (index == 0)
 	return buffer[index];
       else
-	throw JIndexOutOfRange("JArray<>::at()");
+	THROW(JIndexOutOfRange, "invalid index " << 0 << " <= " << index << " < " << N);
     }
     
 
@@ -793,10 +810,10 @@ namespace JTOOLS {
      */
     reference at(int index)
     { 
-      if (index >= 0 && index < N)
+      if (index == 0)
 	return buffer[index];
       else
-	throw JIndexOutOfRange("JArray<>::at()");
+	THROW(JIndexOutOfRange, "invalid index " << 0 << " <= " << index << " < " << N);
     }
 
 
@@ -830,6 +847,17 @@ namespace JTOOLS {
     static size_type size()
     { 
       return N;
+    }
+
+
+    /**
+     * Fill array.
+     *
+     * \param  value            value
+     */
+    void fill(argument_type value)
+    {
+      buffer[0] = value;
     }
 
 
@@ -1053,7 +1081,7 @@ namespace JTOOLS {
       if (index >= 0 && index < N)
 	return p[index];
       else
-	throw JIndexOutOfRange("JArray<>::at()");
+	THROW(JIndexOutOfRange, "invalid index " << 0 << " <= " << index << " < " << N);
     }
 
 
@@ -1209,7 +1237,7 @@ namespace JTOOLS {
       if (index >= 0 && index < N)
 	return p[index];
       else
-	throw JIndexOutOfRange("JArray<>::at()");
+	THROW(JIndexOutOfRange, "invalid index " << 0 << " <= " << index << " < " << N);
     }
 
 

@@ -8,6 +8,9 @@
 #include "JTools/JMultiMapTransformer.hh"
 #include "JTools/JFunctional.hh"
 #include "JTools/JArray.hh"
+#include "JTools/JMultiHistogram.hh"
+#include "JTools/JHistogramMap.hh"
+#include "JTools/JHistogram1D.hh"
 #include "JTools/JResultTransformer.hh"
 #include "JTools/JTransformableMultiHistogram.hh"
 
@@ -118,8 +121,8 @@ namespace JTOOLS {
      *
      * \param  input                multidimensional function
      */
-    template<class JPDF_t, class JPDFMaplist_t, class JPDFDistance_t>    
-    void insert(const JTransformableMultiFunction<JPDF_t, JPDFMaplist_t, JPDFDistance_t>& input) 
+    template<class __JFunction_t, class __JMaplist_t, class __JDistance_t>    
+    void insert(const JTransformableMultiFunction<__JFunction_t, __JMaplist_t, __JDistance_t>& input) 
     {
       this->transformer.reset(input.transformer->clone());
 
@@ -132,8 +135,8 @@ namespace JTOOLS {
      *
      * \param  input                multidimensional histogram
      */
-    template<class JHistogram_t, class JHistogramMaplist_t, class JHistogramDistance_t>
-    void insert(const JTransformableMultiHistogram<JHistogram_t, JHistogramMaplist_t, JHistogramDistance_t>& input)
+    template<class JHistogram_t, class __JMaplist_t, class __JDistance_t>
+    void insert(const JTransformableMultiHistogram<JHistogram_t, __JMaplist_t, __JDistance_t>& input)
     {
       this->transformer.reset(input.transformer->clone());
 
@@ -266,9 +269,6 @@ namespace JTOOLS {
 
 
     JLANG::JSharedPointer<transformer_type> transformer;
-
-  private:
-    mutable JArray<NUMBER_OF_DIMENSIONS, argument_type> buffer;
   };
   
 

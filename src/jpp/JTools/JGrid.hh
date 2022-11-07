@@ -4,8 +4,11 @@
 #include <istream>
 #include <ostream>
 
-#include "JTools/JAbstractCollection.hh"
 #include "JLang/JClass.hh"
+
+#include "JIO/JSerialisable.hh"
+
+#include "JTools/JAbstractCollection.hh"
 
 
 /**
@@ -17,6 +20,9 @@ namespace JPP { using namespace JTOOLS; }
 
 namespace JTOOLS {
 
+  using JIO::JReader;
+  using JIO::JWriter;
+  
   using JLANG::JClass;
 
   template<class JElement_t, class JDistance_t>
@@ -80,7 +86,7 @@ namespace JTOOLS {
      */
     virtual abscissa_type getX(int index) const override 
     {
-      return xmin  +  index * ((xmax - xmin) / (size - 1));
+      return (index == 0 ? xmin : xmin + index * ((xmax - xmin) / (size - 1)));
     }
 
     
@@ -132,6 +138,32 @@ namespace JTOOLS {
       return *this;
     }
 
+
+    /**
+     * Binary stream input.
+     *
+     * \param  in              input stream
+     * \param  grid            grid
+     * \return                 input stream
+     */
+    friend inline JReader& operator>>(JReader& in, JGrid<JAbscissa_t>& grid)
+    {
+      return in >> grid.size >> grid.xmin >> grid.xmax;
+    }
+
+
+    /**
+     * Binary stream output.
+     *
+     * \param  out             output stream
+     * \param  grid            grid
+     * \return                 output stream
+     */
+    friend inline JWriter& operator<<(JWriter& out, const JGrid<JAbscissa_t>& grid)
+    {
+      return out << grid.size << grid.xmin << grid.xmax;
+    }    
+    
     
     /**
      * Read grid from input.
@@ -180,6 +212,19 @@ namespace JTOOLS {
   {
     return JGrid<JAbscissa_t>(nx, Xmin, Xmax);
   }
+
+
+  /**
+   * Helper method to create a grid with a single value.
+   *
+   * \param  value           value
+   * \return                 single-valued grid
+   */
+  template<class JAbscissa_t>
+  inline JGrid<JAbscissa_t> make_grid(const JAbscissa_t value)
+  {
+    return JGrid<JAbscissa_t>(1, value, value);
+  }  
 }
 
 #endif

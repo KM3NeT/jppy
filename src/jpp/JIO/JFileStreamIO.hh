@@ -63,6 +63,27 @@ namespace JIO {
     {
       static_cast<std::ifstream*>(this)->open(file_name, std::ios::binary);
     }
+
+
+    /**
+     * Clear status of reader.
+     */
+    virtual void clear() override
+    {
+      std::ifstream  ::clear();
+      JBufferedReader::clear();
+    }
+
+
+    /**
+     * Rewind.
+     */
+    void rewind()
+    {
+      seekg(0);   // rewind file stream
+
+      reset();    // reset buffer
+    }
   };
 
 

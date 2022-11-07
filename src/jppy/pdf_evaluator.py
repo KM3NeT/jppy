@@ -47,7 +47,7 @@ class PDF(object, metaclass=ABCMeta):
 
     @t0.setter
     def t0(self, value):
-        self._t0 = float(t0)
+        self._t0 = float(value)
 
     @abstractmethod
     def evaluate(self, D, cd, theta, phi, t_obs):

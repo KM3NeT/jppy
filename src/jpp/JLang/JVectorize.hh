@@ -1,6 +1,7 @@
 #ifndef __JLANG__JVECTORIZE__
 #define __JLANG__JVECTORIZE__
 
+#include <ostream>
 #include <vector>
 #include <iterator>
 
@@ -24,7 +25,23 @@ namespace JLANG {
   template<class JElement_t, class JAllocator_t = std::allocator<JElement_t> >
   struct array_type :
     public std::vector<JElement_t, JAllocator_t>
-  {};
+  {
+    /**
+     * Write array to output stream.
+     *
+     * \param  out          output stream
+     * \param  object       array
+     * \return              output stream
+     */
+    friend inline std::ostream& operator<<(std::ostream& out, const array_type& object)
+    {
+      for (typename array_type::const_iterator i = object.begin(); i != object.end(); ++i) {
+	out << ' ' << *i;
+      }
+
+      return out;
+    }
+  };
 
 
   /**

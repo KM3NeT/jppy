@@ -1,5 +1,5 @@
-#ifndef __JMATH__
-#define __JMATH__
+#ifndef __JMATH__JMATH__
+#define __JMATH__JMATH__
 
 #include <cmath>
 #include <iterator>

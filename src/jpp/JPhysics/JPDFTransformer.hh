@@ -1065,7 +1065,7 @@ namespace JPHYSICS {
       const double theta = buffer[2];
       const double phi   = buffer[3];
 
-      const double ct0 = cd;
+      const double ct0 = (cd > -1.0 ? cd < +1.0 ? cd : +1.0 : -1.0);
       const double st0 = sqrt((1.0 + ct0)*(1.0 - ct0));
     
       const double px = sin(theta)*cos(phi);
@@ -1166,6 +1166,16 @@ namespace JPHYSICS {
     {}    
 
     
+    /**
+     * Constructor.
+     *
+     * \param  transformer    transformer
+     */
+    JPDFTransformer(const JFunction4DTransformer_t& transformer) :
+      transformer(transformer)
+    {}
+
+
     /**
      * Constructor.
      *

@@ -130,6 +130,40 @@ namespace JTOOLS {
 
       return *this;
     }
+
+
+    /**
+     * Read set from input.
+     *
+     * \param  in       input stream
+     * \param  object   object
+     * \return          input stream
+     */
+    friend inline std::istream& operator>>(std::istream& in, JSet<JAbscissa_t>& object)
+    {
+      for (JAbscissa_t value; in >> value; ) {
+	object.insert(value);
+      }
+
+      return in;
+    }
+
+
+    /**
+     * Write set to output.
+     *
+     * \param  out      output stream
+     * \param  object   object
+     * \return          output stream
+     */
+    friend inline std::ostream& operator<<(std::ostream& out, const JSet<JAbscissa_t>& object)
+    {
+      for (typename JSet<JAbscissa_t>::const_iterator i = object.begin(); i != object.end(); ++i) {
+	out << ' ' << *i;
+      }
+
+      return out;
+    }
   };
 
 

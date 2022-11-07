@@ -266,13 +266,11 @@ namespace JTOOLS {
      */
     void transform(const transformer_type& transformer)
     {
-      collection_type buffer;
-
-      this->swap(buffer);
-
-      for (const_iterator i = buffer.begin(); i != buffer.end(); ++i) {
-        this->insert(transformer(*i));
+      for (iterator i = this->begin(); i != this->end(); ++i) {
+        *i = transformer(*i);
       }
+      
+      sort();
     }
 
 
@@ -724,12 +722,13 @@ namespace JTOOLS {
     {
       int n;
 
-      in >> n;
+      if (in >> n) {
 
-      collection.resize(n);
+	collection.resize(n);
 
-      for (typename JCollection::iterator i = collection.begin(); i != collection.end(); ++i) {
-        in >> *i;
+	for (typename JCollection::iterator i = collection.begin(); i != collection.end(); ++i) {
+	  in >> *i;
+	}
       }
 
       return in;

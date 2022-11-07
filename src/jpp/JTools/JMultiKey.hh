@@ -71,14 +71,14 @@ namespace JTOOLS {
 
     typedef JKey_t                                               key_type;
     typedef JMultiKey<N-1, JKey_t>                               mapped_type;
-    typedef std::pair<key_type, mapped_type>                     pair;
+    typedef std::pair<key_type, mapped_type>                     pair_type;
 
 
     /**
      * Default constructor.
      */
     JMultiKey() :
-      pair()
+      pair_type()
     {}
 
 
@@ -91,7 +91,7 @@ namespace JTOOLS {
      */
     JMultiKey(typename JClass<mapped_type>::argument_type __first,
 	      typename JClass<key_type>   ::argument_type __second) :
-      pair(__first.first, mapped_type(__first.second, __second))
+      pair_type(__first.first, mapped_type(__first.second, __second))
     {}
 
 
@@ -104,7 +104,7 @@ namespace JTOOLS {
      */
     JMultiKey(typename JClass<key_type>   ::argument_type __first,
 	      typename JClass<mapped_type>::argument_type __second) :	      
-      pair(__first, __second)
+      pair_type(__first, __second)
     {}
 
 
@@ -114,7 +114,7 @@ namespace JTOOLS {
      * \param   key          key
      */
     JMultiKey(typename JArgument<N, JKey_t>::argument_type key) :
-      pair(key.first, key.second)
+      pair_type(key.first, key.second)
     {}
 
 
@@ -225,14 +225,14 @@ namespace JTOOLS {
 
     typedef JKey_t                                               key_type;
     typedef JMultiKey<1, JKey_t>                                 mapped_type;
-    typedef std::pair<key_type, mapped_type>                     pair;
+    typedef std::pair<key_type, mapped_type>                     pair_type;
 
 
     /**
      * Default constructor.
      */
     JMultiKey() :
-      pair()
+      pair_type()
     {}
 
 
@@ -245,7 +245,7 @@ namespace JTOOLS {
      */
     JMultiKey(typename JClass<mapped_type>::argument_type __first,
 	      typename JClass<key_type>   ::argument_type __second) :
-      pair(__first.first, __second)
+      pair_type(__first.first, __second)
     {}
 
 
@@ -258,7 +258,7 @@ namespace JTOOLS {
      */
     JMultiKey(typename JClass<key_type>   ::argument_type __first,
 	      typename JClass<mapped_type>::argument_type __second) :
-      pair(__first, __second.first)
+      pair_type(__first, __second.first)
     {}
 
 
@@ -268,7 +268,7 @@ namespace JTOOLS {
      * \param   key          key
      */
     JMultiKey(typename JArgument<2, JKey_t>::argument_type key) :
-      pair(key.first, key.second)
+      pair_type(key.first, key.second)
     {}
 
 

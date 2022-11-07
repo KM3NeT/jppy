@@ -114,7 +114,7 @@ namespace JLANG {
 
   /**
    * Replace tokens in string.\n
-   * Returns a copy of the string, with all occurences of <tt>target</tt> replaced by <tt>replacement</tt>.
+   * Returns a copy of the string, with all occurrences of <tt>target</tt> replaced by <tt>replacement</tt>.
    *
    * \param  input          input       string
    * \param  target         target      string
@@ -137,7 +137,22 @@ namespace JLANG {
 
   /**
    * Replace characters in string.\n
-   * Returns a copy of the string, with all occurences of <tt>target</tt> replaced by <tt>replacement</tt>.
+   * Returns a copy of the string, with all occurrences of <tt>target</tt> replaced by <tt>replacement</tt>.
+   *
+   * \param  input          input       string
+   * \param  target         target      character
+   * \param  replacement    replacement string
+   * \return                modified    string
+   */
+  inline std::string replace(const std::string& input, const char target, const std::string& replacement)
+  {
+    return replace(input, std::string(1, target), replacement);
+  }
+
+
+  /**
+   * Replace characters in string.\n
+   * Returns a copy of the string, with all occurrences of <tt>target</tt> replaced by <tt>replacement</tt>.
    *
    * \param  input          input       string
    * \param  target         target      character

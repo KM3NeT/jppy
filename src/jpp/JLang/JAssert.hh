@@ -13,16 +13,18 @@ namespace JLANG {
   /**
    * Generation of compiler error.
    */
-  template<bool>
+  template<bool, class T = void>
   struct JAssert;
 
   /**
    * Implementation of valid assertion.
    */
-  template<>
-  struct JAssert<true> 
+  template<class T>
+  struct JAssert<true, T> 
   {
     static const bool value = true;
+
+    typedef T type;
   };
 }
 

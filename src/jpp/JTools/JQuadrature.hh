@@ -28,7 +28,7 @@ namespace JTOOLS {
   /**
    * Type definition for numerical integration.
    *
-   *          \f$\displaystyle \int_{x_1}^{x_2} f(x) dx = \sum_{i=1}^{N} w_i f(x_i) \f$
+   *          \f[\displaystyle \int_{x_1}^{x_2} f(x) dx = \sum_{i=1}^{N} w_i f(x_i) \f]
    *
    * The abscissa and ordinate values of the collection can be used
    * as abscissa and weight values of the summation to approximately
@@ -48,8 +48,8 @@ namespace JTOOLS {
     /**
      * General purpose constructor.
      *
-     * The template argument should correspond to a function requiring two arguments.
-     * These two arguments should correspond to the lower and upper integration limit, respectively.
+     * The template argument should correspond to a function requiring two arguments.\n
+     * These two arguments should correspond to the lower and upper integration limit, respectively.\n
      * The given function should return the value of the integral between the two integration limits. 
      *
      * \param  xmin       minimal x
@@ -102,7 +102,7 @@ namespace JTOOLS {
 
 
   /**
-   * Numerical integrator for <tt>W(x) = 1</tt>.
+   * Numerical integrator for \f$ W(x) = 1 \f$.
    * 
    * Gauss-Legendre integration code is taken from reference:
    * Numerical Recipes in C++, W.H. Press, S.A. Teukolsky, W.T. Vetterling and B.P. Flannery, 
@@ -163,7 +163,7 @@ namespace JTOOLS {
 
 
   /**
-   * Numerical integrator for <tt>W(x) = x^a e^(-x)</tt>.
+   * Numerical integrator for \f$ W(x) = x^{a} \, e^{-x} \f$.
    *
    * Gauss-Laguerre integration code is taken from reference:
    * Numerical Recipes in C++, W.H. Press, S.A. Teukolsky, W.T. Vetterling and B.P. Flannery, 
@@ -187,15 +187,16 @@ namespace JTOOLS {
     {
       const int number_of_iterations = 100;
 
-      double z, z1;
+      double z1;
       double p0, p1, p2, pp;
       
+      double z = (1.0 + alf) * (3.0 + 0.92*alf) / (1.0 + 2.4*n + 1.8*alf); 
+
       for (int i = 0; i < n; ++i) {
 	
 	switch (i) {
 
 	case 0:
-	  z  = (1.0 + alf) * (3.0 + 0.92*alf) / (1.0 + 2.4*n + 1.8*alf);
 	  break;
 
 	case 1:
@@ -208,10 +209,7 @@ namespace JTOOLS {
 	  break;
 	}
 
-
-	int k;
-
-	for (k = 0; k != number_of_iterations; ++k) {
+	for (int k = 0; k != number_of_iterations; ++k) {
 	  
 	  p1 = 0.0;
 	  p2 = 1.0;
@@ -242,7 +240,7 @@ namespace JTOOLS {
 
 
   /**
-   * Numerical integrator for <tt>W(x) = e^-(x^2)</tt>.
+   * Numerical integrator for \f$ W(x) = e^{-x^{2}} \f$.
    *
    * Gauss-Hermite integration code is taken from reference:
    * Numerical Recipes in C++, W.H. Press, S.A. Teukolsky, W.T. Vetterling and B.P. Flannery, 
@@ -331,8 +329,7 @@ namespace JTOOLS {
 
 
   /**
-   * Numerical integrator for <tt>W(x) = (1 + g^2 - 2gx)^a</tt>.
-   * For this, <tt>g > 0</tt>.
+   * Numerical integrator for \f$ W(x) = (1 + g^{2} - 2gx)^{a} \f$, where \f$ g > 0 \f$.
    *
    * Henyey-Greenstein integration points and weights.
    */ 
@@ -435,8 +432,7 @@ namespace JTOOLS {
 
 
   /**
-   * Numerical integrator for <tt>W(x) = (1 + g*x*x)</tt>.
-   * For this, <tt>g > 0</tt>.
+   * Numerical integrator for \f$ W(x) = 1 + g \, x^{2} \f$, where \f$ g > 0 \f$.
    *
    * Rayleigh integration points and weights.
    */ 
@@ -479,7 +475,7 @@ namespace JTOOLS {
 
 
   /**
-   * Numerical integrator for <tt>W(x) = |x| / sqrt(1 - x*x)</tt>
+   * Numerical integrator for \f$ W(x) = \left|x\right| / \sqrt{1 - x^{2}} \f$.
    *
    * Co-tangent integration points and weights.
    */ 
@@ -508,7 +504,7 @@ namespace JTOOLS {
 
 
   /**
-   * Numerical integrator for <tt>W(x) = |x| / sqrt(1 - x*x), x > 0 </tt> and <tt>W(x) =  1, x <= 0</tt>.
+   * Numerical integrator for \f$ W(x) = \left|x\right| / \sqrt{1 - x^{2}} \f$ for \f$ x > 0 \f$ and \f$ W(x) = 1 \f$ for \f$ x \le 0 \f$.
    *
    * Bi-tangent integration points and weights.
    */ 

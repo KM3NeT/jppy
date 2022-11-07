@@ -27,7 +27,7 @@ namespace JTOOLS {
    *
    * The template parameters refer to the dimension of the map and the data type of the argument, respectively.
    *
-   * This class extends the JClonable and JSerialisable interfacea.
+   * This class extends the JClonable and JSerialisable interfaces.
    */
   template<unsigned int N, class JArgument_t>
   class JMultiMapTransformer :

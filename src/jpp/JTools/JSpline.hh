@@ -6,6 +6,7 @@
 #include "JMath/JZero.hh"
 #include "JLang/JException.hh"
 #include "JLang/JClass.hh"
+#include "JLang/JStreamAvailable.hh"
 #include "JTools/JFunctional.hh"
 #include "JTools/JDistance.hh"
 #include "JTools/JResult.hh"
@@ -364,28 +365,38 @@ namespace JTOOLS {
      */
     virtual result_type evaluate(const argument_type* pX) const override 
     {
-      if (this->size() <= 1u) {
-        return this->getExceptionHandler().action(JFunctionalException("JSplineFunction<>::evaluate() not enough data."));
-      }
-
       const argument_type x = *pX;
 
-      const_iterator p = this->lower_bound(x);
+      if (this->size() > 1u) {
 
-      if ((p == this->begin() && this->getDistance(x, (p++)->getX()) > distance_type::precision) ||
-          (p == this->end()   && this->getDistance((--p)->getX(), x) > distance_type::precision)) {
+	const_iterator p = this->lower_bound(x);
 
-        return this->getExceptionHandler().action(JValueOutOfRange("JSplineFunction::evaluate() x out of range."));
+	if ((p == this->begin() && this->getDistance(x, (p++)->getX()) > distance_type::precision) ||
+	    (p == this->end()   && this->getDistance((--p)->getX(), x) > distance_type::precision)) {
+
+	  return this->getExceptionHandler().action(MAKE_EXCEPTION(JValueOutOfRange, "abscissa out of range " 
+								   << STREAM("?") << x                      << " <> " 
+								   << STREAM("?") << this->begin() ->getX() << ' '
+								   << STREAM("?") << this->rbegin()->getX()));
+	}
+
+	const_iterator q = p--;
+
+	const double dx = this->getDistance(p->getX(), q->getX());
+	const double a  = this->getDistance(x, q->getX()) / dx;
+	const double b  = 1.0 - a;
+
+	return (a * p->getY() + b * q->getY()
+		- a*b * ((a + 1.0)*p->getU() + (b + 1.0)*q->getU()) * dx*dx/6);
+	
+      } else if (this->size() == 1u && this->getDistance(x, this->begin()->getX()) <= distance_type::precision) {
+
+	return this->begin()->getY();
+	
+      } else {
+
+        return this->getExceptionHandler().action(MAKE_EXCEPTION(JFunctionalException, "not enough data " << STREAM("?") << x));
       }
-
-      const_iterator q = p--;
-
-      const double dx = this->getDistance(p->getX(), q->getX());
-      const double a  = this->getDistance(x, q->getX()) / dx;
-      const double b  = 1.0 - a;
-
-      return a * p->getY() + b * q->getY()
-	- a*b * ((a + 1.0)*p->getU() + (b + 1.0)*q->getU()) * dx*dx/6;
     }
   };
 
@@ -441,11 +452,11 @@ namespace JTOOLS {
      */
     virtual result_type evaluate(const argument_type* pX) const override 
     {
-      if (this->size() <= 1u) {
-        return this->getExceptionHandler().action(JFunctionalException("JSplineFunction<>::evaluate() not enough data."));
-      }
-
       const argument_type x = *pX;
+
+      if (this->size() <= 1u) {
+        return this->getExceptionHandler().action(MAKE_EXCEPTION(JFunctionalException, "not enough data " << STREAM("?") << x));
+      }
 
       const_iterator p = this->lower_bound(x);
 
@@ -453,7 +464,10 @@ namespace JTOOLS {
       if ((p == this->begin() && this->getDistance(x, (p++)->getX()) > distance_type::precision) ||
           (p == this->end()   && this->getDistance((--p)->getX(), x) > distance_type::precision)) {
 
-        return this->getExceptionHandler().action(JValueOutOfRange("JSplineFunction::evaluate() x out of range."));
+        return this->getExceptionHandler().action(MAKE_EXCEPTION(JValueOutOfRange, "abscissa out of range " 
+								 << STREAM("?") << x                      << " <> " 
+								 << STREAM("?") << this->begin() ->getX() << ' '
+								 << STREAM("?") << this->rbegin()->getX()));
       }
 
       const_iterator q = p--;
@@ -563,11 +577,11 @@ namespace JTOOLS {
      */
     virtual result_type evaluate(const argument_type* pX) const override 
     {
-      if (this->size() <= 1u) {
-        return this->getExceptionHandler().action(JFunctionalException("JSplineFunction<>::evaluate() not enough data."));
-      }
-      
       const argument_type x = *pX;
+
+      if (this->size() <= 1u) {
+        return this->getExceptionHandler().action(MAKE_EXCEPTION(JFunctionalException, "not enough data " << STREAM("?") << x));
+      }
 
       const_iterator p = this->lower_bound(x);
 
@@ -575,7 +589,8 @@ namespace JTOOLS {
 
 	try {
 
-	  result   = this->getExceptionHandler().action(JValueOutOfRange("JSplineFunction<>::operator() x < xmin."));
+          result   = this->getExceptionHandler().action(MAKE_EXCEPTION(JValueOutOfRange, "abscissa out of range " 
+								       << STREAM("?") << x << " < " << STREAM("?") << this->begin() ->getX()));
 
 	  // overwrite integral values
 
@@ -592,7 +607,8 @@ namespace JTOOLS {
 
 	try {
 
-	  result   = this->getExceptionHandler().action(JValueOutOfRange("JSplineFunction<>::operator() x > xmax."));
+          result   = this->getExceptionHandler().action(MAKE_EXCEPTION(JValueOutOfRange, "abscissa out of range " 
+								       << STREAM("?") << x << " > " << STREAM("?") << this->rbegin() ->getX()));
 
 	  // overwrite integral values
 
