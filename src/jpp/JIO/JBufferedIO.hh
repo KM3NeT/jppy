@@ -39,9 +39,7 @@ namespace JIO {
       size   = std::max(__size, 1024);
       buffer = new char[size];
 
-      pos = 0;
-      ls  = 0;
-      eof = true;
+      reset();
     }
 
 
@@ -119,8 +117,17 @@ namespace JIO {
       return n;
     }
 
-
   protected:
+    /**
+     * Reset.
+     */
+    void reset()
+    {
+      pos = 0;
+      ls  = 0;
+      eof = true;
+    }
+
     JLANG::JSinglePointer<JReader> in;
 
     char* buffer;  //!< internal buffer
@@ -128,6 +135,12 @@ namespace JIO {
     int   pos;     //!< pointer to begin of available data
     int   ls;      //!< pointer to end   of available data
     bool  eof;     //!< end of file
+
+  private:
+    JBufferedReader(const JBufferedReader&);
+    JBufferedReader(JBufferedReader&&);
+    JBufferedReader& operator=(const JBufferedReader&);
+    JBufferedReader& operator=(JBufferedReader&&);
   };
 
 
@@ -225,6 +238,12 @@ namespace JIO {
     char* buffer;  //!< internal buffer
     int   size;    //!< size of internal buffer
     int   pos;     //!< pointer to end of buffered data
+
+  private:
+    JBufferedWriter(const JBufferedWriter&);
+    JBufferedWriter(JBufferedWriter&&);
+    JBufferedWriter& operator=(const JBufferedWriter&);
+    JBufferedWriter& operator=(JBufferedWriter&&);
   };
 }
 

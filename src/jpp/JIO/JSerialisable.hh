@@ -147,21 +147,21 @@ namespace JIO {
     }
 
 
-    JWriter& operator<<(const bool&                   value) { write((const char*) &value, sizeof(bool));                   return *this; }
-    JWriter& operator<<(const char&                   value) { write((const char*) &value, sizeof(char));                   return *this; } 
-    JWriter& operator<<(const unsigned char&          value) { write((const char*) &value, sizeof(unsigned char));          return *this; }
-    JWriter& operator<<(const short&                  value) { write((const char*) &value, sizeof(short));                  return *this; }
-    JWriter& operator<<(const unsigned short&         value) { write((const char*) &value, sizeof(unsigned short));         return *this; }
-    JWriter& operator<<(const int&                    value) { write((const char*) &value, sizeof(int));                    return *this; }
-    JWriter& operator<<(const unsigned int&           value) { write((const char*) &value, sizeof(unsigned int));           return *this; }
-    JWriter& operator<<(const long int&               value) { write((const char*) &value, sizeof(long int));               return *this; }
-    JWriter& operator<<(const unsigned long int&      value) { write((const char*) &value, sizeof(unsigned long int));      return *this; }
-    JWriter& operator<<(const long long int&          value) { write((const char*) &value, sizeof(long long int));          return *this; }
-    JWriter& operator<<(const unsigned long long int& value) { write((const char*) &value, sizeof(unsigned long long int)); return *this; }
-    JWriter& operator<<(const float&                  value) { write((const char*) &value, sizeof(float));                  return *this; }
-    JWriter& operator<<(const double&                 value) { write((const char*) &value, sizeof(double));                 return *this; }
-    JWriter& operator<<(const long double&            value) { write((const char*) &value, sizeof(long double));            return *this; }
-    JWriter& operator<<(const JLANG::JObjectID&       value) { return (*this) << value.getID(); }
+    JWriter& operator<<(const bool                   value) { write((const char*) &value, sizeof(bool));                   return *this; }
+    JWriter& operator<<(const char                   value) { write((const char*) &value, sizeof(char));                   return *this; } 
+    JWriter& operator<<(const unsigned char          value) { write((const char*) &value, sizeof(unsigned char));          return *this; }
+    JWriter& operator<<(const short                  value) { write((const char*) &value, sizeof(short));                  return *this; }
+    JWriter& operator<<(const unsigned short         value) { write((const char*) &value, sizeof(unsigned short));         return *this; }
+    JWriter& operator<<(const int                    value) { write((const char*) &value, sizeof(int));                    return *this; }
+    JWriter& operator<<(const unsigned int           value) { write((const char*) &value, sizeof(unsigned int));           return *this; }
+    JWriter& operator<<(const long int               value) { write((const char*) &value, sizeof(long int));               return *this; }
+    JWriter& operator<<(const unsigned long int      value) { write((const char*) &value, sizeof(unsigned long int));      return *this; }
+    JWriter& operator<<(const long long int          value) { write((const char*) &value, sizeof(long long int));          return *this; }
+    JWriter& operator<<(const unsigned long long int value) { write((const char*) &value, sizeof(unsigned long long int)); return *this; }
+    JWriter& operator<<(const float                  value) { write((const char*) &value, sizeof(float));                  return *this; }
+    JWriter& operator<<(const double                 value) { write((const char*) &value, sizeof(double));                 return *this; }
+    JWriter& operator<<(const long double            value) { write((const char*) &value, sizeof(long double));            return *this; }
+    JWriter& operator<<(const JLANG::JObjectID&      value) { return (*this) << value.getID(); }
 
 
     /**

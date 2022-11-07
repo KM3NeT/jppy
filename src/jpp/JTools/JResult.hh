@@ -374,7 +374,7 @@ namespace JTOOLS {
     /**
      * Constructor.\n
      * This constructor refers to the result of a signal with a constant rate <tt>R</tt>
-     * to produce an event occuring at the given moment <tt>x</tt> within the fixed range <tt>X</tt>.
+     * to produce an event occurring at the given moment <tt>x</tt> within the fixed range <tt>X</tt>.
      *
      * \param  R               rate
      * \param  x               abscissa value
@@ -781,7 +781,7 @@ namespace JTOOLS {
      *
      * \return                  result
      */
-    static result_type get_total_integral(typename JLANG::JClass<T>::argument_type value)
+    static result_type get_total_integral(const JResultDerivative<T>& value)
     {
       return JMATH::zero;
     }
@@ -831,7 +831,7 @@ namespace JTOOLS {
      *
      * \return                  result
      */
-    static result_type get_total_integral(typename JLANG::JClass<T>::argument_type value)
+    static result_type get_total_integral(const JResultHesse<T>& value)
     {
       return JMATH::zero;
     }
@@ -881,7 +881,7 @@ namespace JTOOLS {
      *
      * \return                  result
      */
-    static result_type get_total_integral(typename JLANG::JClass<T>::argument_type value)
+    static result_type get_total_integral(const JResultPDF<T>& value)
     {
       return JResultEvaluator<T>::get_value(value.V);
     }
@@ -931,7 +931,7 @@ namespace JTOOLS {
      *
      * \return                  result
      */
-    static result_type get_total_integral(typename JLANG::JClass<T>::argument_type value)
+    static result_type get_total_integral(const JResultPolynome<N, T>& value)
     {
       return JMATH::zero;
     }

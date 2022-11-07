@@ -4,7 +4,6 @@
 #include <string>
 #include <sstream>
 
-#include "JLang/JException.hh"
 #include "Jeep/JeepToolkit.hh"
 
 /**
@@ -17,8 +16,6 @@ namespace JPHYSICS {}
 namespace JPP { using namespace JPHYSICS; }
 
 namespace JPHYSICS {
-
-  using JLANG::JException;
 
 
   /**
@@ -45,15 +42,14 @@ namespace JPHYSICS {
     DIRECT_LIGHT_FROM_BRIGHT_POINT     =   23,      //!< direct    light from bright point
     SCATTERED_LIGHT_FROM_BRIGHT_POINT  =   24,      //!< scattered light from bright point
 
+    LIGHT_FROM_ELONGATED_EMSHOWER      =  113,      //!< light from elongated EM shower
+
     LIGHT_FROM_MUON                    = 1001,      //!< direct and scattered light from muon
     LIGHT_FROM_EMSHOWERS               = 1003,      //!< direct and scattered light from EM showers
     LIGHT_FROM_DELTARAYS               = 1005,      //!< direct and scattered light from delta-rays
     LIGHT_FROM_EMSHOWER                = 1013,      //!< direct and scattered light from EM shower
     LIGHT_FROM_BRIGTH_POINT            = 1023       //!< direct and scattered light from brigth point
   };
-
-
-  static const char WILD_CARD = '%';            //!< wild card character for file name substitution
 
 
   /**
@@ -102,21 +98,9 @@ namespace JPHYSICS {
 
 
   /**
-   * Check wild card.
-   *
-   * \param  file_name          file name
-   * \return                    true if wild card present; else false
-   */
-  inline bool hasWildCard(const std::string& file_name)
-  {
-    return (file_name.find(WILD_CARD) != std::string::npos);
-  }
-
-
-  /**
    * Get PDF file name.
    *
-   * The input file name should contain the wild card character WILD_CARD 
+   * The input file name should contain the wild card character JEEP::FILENAME_WILD_CARD 
    * which will be replaced by the label corresponding to the given PDF type.
    * 
    * \param  file_name          input  file name
@@ -126,17 +110,7 @@ namespace JPHYSICS {
   inline std::string getFilename(const std::string& file_name, 
 				 const JPDFType_t   pdf)
   {
-    using namespace std;
-
-    string buffer = file_name;
-
-    string::size_type pos = buffer.find(WILD_CARD);
-    
-    if (pos == string::npos) {	  
-      throw JException(string("Method getFilename(): Missing wild card character \'") + WILD_CARD + "\'.");
-    }
-
-    return buffer.replace(pos, 1, getLabel(pdf));
+    return JEEP::setWildCard(file_name, getLabel(pdf));
   }
 
 

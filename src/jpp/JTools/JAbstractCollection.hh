@@ -1,6 +1,8 @@
 #ifndef __JTOOLS__JABSTRACTCOLLECTION__
 #define __JTOOLS__JABSTRACTCOLLECTION__
 
+#include <math.h>
+
 
 /**
  * \author mdejong
@@ -10,13 +12,14 @@ namespace JTOOLS {}
 namespace JPP { using namespace JTOOLS; }
 
 namespace JTOOLS {
+  
 
   /**
    * Abstract interface for abscissa values of a collection of elements.
    */
   template<class JAbscissa_t>
-  struct JAbstractCollection {
-
+  struct JAbstractCollection
+  {
     typedef JAbscissa_t                                                   abscissa_type;
 
 
@@ -81,6 +84,33 @@ namespace JTOOLS {
       }
 
       return false;
+    }
+
+
+    /**
+     * Less than method.
+     *
+     * \param  first           first  abstract collection    
+     * \param  second          second abstract collection
+     * \return                 true if first collection is less than second collection; else false
+     */
+    friend inline bool operator<(const JAbstractCollection& first,
+				 const JAbstractCollection& second)
+    {
+      using namespace std;
+      
+      if (first.getSize() == second.getSize()) {
+
+	if (fabs(first.getXmin() - second.getXmin()) > 0.0) {
+	  return first.getXmin() < second.getXmin();
+	} else {
+	  return first.getXmax() < second.getXmax();
+	}
+	
+      } else {
+
+	return first.getSize() < second.getSize();
+      }
     }
   };
 }

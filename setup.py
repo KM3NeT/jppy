@@ -105,7 +105,7 @@ if __name__ == '__main__':
                     get_pybind_include(user=True),
                     get_jpp_include()
                 ],
-                language='c++') for module in ['constants', 'geane', 'pdf', 'npe']
+                language='c++') for module in ['constants', 'geane', 'pdf', 'npe', 'oscprob', 'lang']
         ],
         cmdclass = dict(
             build_ext = BuildExt

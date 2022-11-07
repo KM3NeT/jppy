@@ -21,11 +21,13 @@ namespace JPHYSICS {
   /**
    * Equivalent muon track length per unit shower energy.
    *
+   * See ANTARES internal note ANTARES-SOFT-2002-015, J.\ Brunner.
+   *
    * \return        equivalent muon track length [m/Gev]
    */
   inline double geanc()
   {
-    return 4.7;                   // dx/dE [m/GeV]
+    return 4.7319;                   // dx/dE [m/GeV]
   }
 
 
@@ -47,7 +49,7 @@ namespace JPHYSICS {
     /**
      * Get energy loss constant.
      *
-     * \return         Energy loss due to pair production and Bremstrahlung [m^-1]
+     * \return         Energy loss due to pair production and bremsstrahlung [m^-1]
      */
     virtual double getB() const = 0;
 
@@ -114,10 +116,10 @@ namespace JPHYSICS {
    * Function object for the energy loss of the muon.\n
    * The energy loss can be formulated as:
    *
-   *     \f[ -\frac{dE}{dx}  =  a + bE\f]
+   *     \f[ -\frac{dE}{dx}  =  a + bE \f]
    *
    * N.B:
-   * \f$a\f$ and \f$b\f$ are assumed constant (internal units m and GeV, respectively).
+   * \f$ a \f$ and \f$ b \f$ are assumed constant (internal units m and GeV, respectively).
    */
   class JGeane_t :
     public JGeane
@@ -126,7 +128,7 @@ namespace JPHYSICS {
     /**
      * constructor
      * \param  __a     Energy loss due to ionisation [GeV/m]
-     * \param  __b     Energy loss due to pair production and Bremstrahlung [m^-1]
+     * \param  __b     Energy loss due to pair production and bremsstrahlung [m^-1]
      */ 
     JGeane_t(const double __a,
 	     const double __b) :
@@ -149,7 +151,7 @@ namespace JPHYSICS {
     /**
      * Get energy loss constant.
      *
-     * \return         Energy loss due to pair production and Bremstrahlung [m^-1]
+     * \return         Energy loss due to pair production and bremsstrahlung [m^-1]
      */
     virtual double getB() const override 
     {
@@ -204,8 +206,8 @@ namespace JPHYSICS {
   class JGeaneWater : 
     public JGeane,
     protected std::map<double, JGeane_t>
-  {
-  public:
+  {    
+  public:    
     /**
      * Default constructor.
      */
@@ -237,7 +239,7 @@ namespace JPHYSICS {
      *
      * N.B. The return value corresponds to the medium-energy regime.
      *
-     * \return         Energy loss due to pair production and Bremstrahlung [m^-1]
+     * \return         Energy loss due to pair production and bremsstrahlung [m^-1]
      */
     virtual double getB() const override 
     {
@@ -257,7 +259,7 @@ namespace JPHYSICS {
       double E1 = E;
       double x1 = dx;
 
-      if (E1 > MASS_MUON) {
+      if (E1 > MASS_MUON / getSinThetaC()) {
 
 	const_iterator p = this->lower_bound(E1);
 
@@ -281,12 +283,68 @@ namespace JPHYSICS {
     }
 
 
+
+
+    /**
+     * Get energy loss due to ionisation.
+     *
+     * \param  E           initial energy                [GeV]
+     * \param  dx          distance traveled             [m]
+     * \return             energy loss due to ionisation [GeV]
+     */
+    double getEa(const double E, const double dx) const
+    {
+      using namespace std;
+      using namespace JPP;
+      
+      double Ea = 0.0;
+      
+      double E1 = E;
+      double x1 = dx;
+
+      if (E1 > MASS_MUON / getSinThetaC()) {
+
+	map<double, JGeane_t>::const_iterator p = this->lower_bound(E1);
+
+	do {
+
+	  --p;
+
+	  const double x2 = p->second.getX(E1, p->first);
+
+	  Ea += (x2 > x1 ? x1 : x2) * p->second.getA();
+	  E1  = p->first;
+	  
+	  x1 -= x2;
+	  
+	} while (p != this->cbegin() && x1 > 0.0);
+      }
+
+      return Ea;
+    }
+
+
+    /**
+     * Get energy loss due to pair production and bremsstrahlung.
+     *
+     * \param  E           initial energy                                        [GeV]
+     * \param  dx          distance traveled                                     [m]
+     * \return             energy loss due to pair production and bremsstrahlung [GeV]
+     */
+    double getEb(const double E, const double dx) const
+    {
+      const double dE = E - getE(E, dx);
+      
+      return dE - getEa(E, dx);
+    }
+
+
     /**
      * Get distance traveled by muon.
      *
      * \param  E0      Energy of muon at start [GeV]
      * \param  E1      Energy of muon at end   [GeV]
-     * \return         distance traveled [m]
+     * \return         distance traveled       [m]
      */
     virtual double getX(const double E0, 
 			const double E1) const override
@@ -294,7 +352,7 @@ namespace JPHYSICS {
       double E  = E0;
       double dx = 0.0;
 
-      if (E > MASS_MUON) {
+      if (E > MASS_MUON / getSinThetaC()) {
 
 	const_iterator p = this->lower_bound(E);
 

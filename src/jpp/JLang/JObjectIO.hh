@@ -1,6 +1,7 @@
 #ifndef __JLANG__JOBJECTIO__
 #define __JLANG__JOBJECTIO__
 
+#include <string>
 #include <fstream>
 
 #include "JLang/JType.hh"
@@ -51,7 +52,7 @@ namespace JLANG {
    * \param  object          object to be read
    */
   template<class JReader_t, class T>
-  inline void load(const char* file_name, T& object)
+  inline void load(const std::string& file_name, T& object)
   {
     load(file_name, object, JType<JReader_t>());
   }
@@ -64,7 +65,7 @@ namespace JLANG {
    * \param  object          object to be written
    */
   template<class JWriter_t, class T>
-  inline void store(const char* file_name, const T& object)
+  inline void store(const std::string& file_name, const T& object)
   {
     store(file_name, object, JType<JWriter_t>());
   }
@@ -88,9 +89,9 @@ namespace JLANG {
    * \param  type            reader type
    */
   template<class JReader_t, class T>
-  inline void load(const char* file_name, T& object, JType<JReader_t> type)
+  inline void load(const std::string& file_name, T& object, JType<JReader_t> type)
   {
-    JReader_t in(file_name);
+    JReader_t in(file_name.c_str());
     
     if (!in) {
       THROW(JFileOpenException, "Error opening file: " << file_name);
@@ -124,9 +125,9 @@ namespace JLANG {
    * \param  type            writer type
    */
   template<class JWriter_t, class T>
-  inline void store(const char* file_name, const T& object, JType<JWriter_t> type)
+  inline void store(const std::string& file_name, const T& object, JType<JWriter_t> type)
   {
-    JWriter_t out(file_name);
+    JWriter_t out(file_name.c_str());
 
     if (!out) {
       THROW(JFileOpenException, "Error opening file: " << file_name);
@@ -135,6 +136,32 @@ namespace JLANG {
     out << object;
 
     out.close();
+  }
+
+
+  /**
+   * Load object from input file.
+   *
+   * \param  file_name       file name
+   * \param  object          object to be read
+   */
+  template<class T>
+  inline void load(const std::string& file_name, T& object)
+  {
+    load(file_name, object, JType<std::ifstream>());
+  }
+
+
+  /**
+   * Store object to output file.
+   *
+   * \param  file_name       file name
+   * \param  object          object to be written
+   */
+  template<class T>
+  inline void store(const std::string& file_name, const T& object)
+  {
+    store(file_name, object, JType<std::ofstream>());
   }
 }
 

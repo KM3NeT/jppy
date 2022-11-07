@@ -212,11 +212,11 @@ namespace JTOOLS {
      */
     virtual result_type evaluate(const argument_type* pX) const override 
     {
-      if (this->size() <= 1u) {
-        return this->getExceptionHandler().action(JFunctionalException("JHermiteSplineFunction<>::evaluate() not enough data."));
-      }
-
       const argument_type x = *pX;
+
+      if (this->size() <= 1u) {
+        return this->getExceptionHandler().action(MAKE_EXCEPTION(JFunctionalException, "not enough data " << STREAM("?") << x));
+      }
 
       const_iterator p = this->lower_bound(x);
 
@@ -292,11 +292,11 @@ namespace JTOOLS {
      */
     virtual result_type evaluate(const argument_type* pX) const override 
     {
-      if (this->size() <= 1u) {
-        return this->getExceptionHandler().action(JFunctionalException("JHermiteSplineFunction<>::evaluate() not enough data."));
-      }
-
       const argument_type x = *pX;
+
+      if (this->size() <= 1u) {
+        return this->getExceptionHandler().action(MAKE_EXCEPTION(JFunctionalException, "not enough data " << STREAM("?") << x));
+      }
 
       const_iterator p = this->lower_bound(x);
 
@@ -392,11 +392,11 @@ namespace JTOOLS {
      */
     virtual result_type evaluate(const argument_type* pX) const override 
     {
-      if (this->size() <= 1u) {
-        return this->getExceptionHandler().action(JFunctionalException("JHermiteSplineFunction<>::evaluate() not enough data."));
-      }
-      
       const argument_type x = *pX;
+
+      if (this->size() <= 1u) {
+        return this->getExceptionHandler().action(MAKE_EXCEPTION(JFunctionalException, "not enough data " << STREAM("?") << x));
+      }
 
       const_iterator p = this->lower_bound(x);
 

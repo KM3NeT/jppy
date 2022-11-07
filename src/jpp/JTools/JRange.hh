@@ -375,17 +375,16 @@ namespace JTOOLS {
 
     /**
      * Test overlap with given range.\n
-     * The result is equivalent to join(range).is_valid().
      *
      * \param  range            range
      * \return                  true if there is a non-zero overlap; else false
      */
     bool overlap(const range_type& range) const
     {  
-      return (compare(getLowerLimit(), range.getUpperLimit()) &&
-	      compare(range.getLowerLimit(), getUpperLimit()));
+      return (!compare(range.getUpperLimit(), getLowerLimit()) &&
+	      !compare(getUpperLimit(), range.getLowerLimit()));
     }
-
+    
 
     /**
      * Include given value to range.\n
@@ -395,15 +394,15 @@ namespace JTOOLS {
      * \param  x                value
      * \return                  range
      */
-    range_type include(argument_type x)
+    range_type& include(argument_type x)
     {
       if (compare(x, getLowerLimit())) { setLowerLimit(x); }
       if (compare(getUpperLimit(), x)) { setUpperLimit(x); }
 
       return *this;
     }
-
-
+    
+    
     /**
      * Join ranges.\n
      * The new lower limit is the maximim of the two lower limits and\n
@@ -414,7 +413,7 @@ namespace JTOOLS {
      * \param  range            range
      */
     range_type& join(const range_type& range)
-    {  
+    {
       if (compare(getLowerLimit(), range.getLowerLimit())) { setLowerLimit(range.getLowerLimit()); }
       if (compare(range.getUpperLimit(), getUpperLimit())) { setUpperLimit(range.getUpperLimit()); }
 
@@ -437,8 +436,8 @@ namespace JTOOLS {
 
       return *this;
     }
-
-
+    
+    
     /**
      * Add offset.
      *
@@ -524,18 +523,6 @@ namespace JTOOLS {
       this->second /= factor;
 
       return *this;
-    }
-
-
-    /**
-     * Get expected number of occurances of given rate within this interval.
-     *
-     * \param  R                rate
-     * \return                  expectation value
-     */
-    T getN(const double R) const
-    {
-      return R * (getUpperLimit() - getLowerLimit());
     }
 
 
@@ -700,7 +687,7 @@ namespace JTOOLS {
     return JRange<T, JComparator_t>(first).combine(second);
   }
 
-
+  
   /**
    * Auxiliary method to create range of values.
    *
@@ -713,6 +700,20 @@ namespace JTOOLS {
   {
     return JRange<T>(x,y);
   } 
+
+
+  /**
+   * Get expected number of occurrences due to given rate within specified interval.
+   *
+   * \param  range            interval
+   * \param  R                rate
+   * \return                  expectation value
+   */
+  template<class T>
+  inline double getN(const JRange<T>& range, const double R)
+  {
+    return R * (range.getUpperLimit() - range.getLowerLimit());
+  }
 }
 
 #endif

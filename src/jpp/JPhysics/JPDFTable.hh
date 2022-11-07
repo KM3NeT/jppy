@@ -8,6 +8,7 @@
 #include "JTools/JQuantiles.hh"
 #include "JTools/JSet.hh"
 #include "JTools/JRange.hh"
+#include "JMath/JMathSupportkit.hh"
 #include "JPhysics/JConstants.hh"
 #include "JPhysics/JPDFTransformer.hh"
 
@@ -74,8 +75,8 @@ namespace JPHYSICS {
      *
      * \param  input                multi-dimensional function
      */
-    template<class JPDF_t, class JPDFMaplist_t, class JPDFDistance_t>    
-    JPDFTable(const JTransformableMultiFunction<JPDF_t, JPDFMaplist_t, JPDFDistance_t>& input) :
+    template<class __JFunction_t, class __JMaplist_t, class __JDistance_t>    
+    JPDFTable(const JTransformableMultiFunction<__JFunction_t, __JMaplist_t, __JDistance_t>& input) :
       transformablemultifunction_type(input)
     {}
 
@@ -85,8 +86,8 @@ namespace JPHYSICS {
      *
      * \param  input                multi-dimensional histogram
      */
-    template<class JHistogram1D_t, class JHistogramMaplist_t, class JHistogramDistance_t>
-    JPDFTable(const JTransformableMultiHistogram<JHistogram1D_t, JHistogramMaplist_t, JHistogramDistance_t>& input) :
+    template<class JHistogram_t, class __JMaplist_t, class __JDistance_t>
+    JPDFTable(const JTransformableMultiHistogram<JHistogram_t, __JMaplist_t, __JDistance_t>& input) :
       transformablemultifunction_type(input)
     {}
 
@@ -113,7 +114,7 @@ namespace JPHYSICS {
 	      const double quantile       = 0.99)
     {
       using namespace std;
-      using namespace JTOOLS;
+      using namespace JPP;
 
       typedef typename transformer_type::array_type  array_type;
 
@@ -256,51 +257,6 @@ namespace JPHYSICS {
       this->transformer->write(out);
 
       return out;
-    }
-
-  protected:
-    /**
-     * Gauss function (normalised to 1 at x = 0).
-     *
-     * \param  x                    x
-     * \param  sigma                sigma
-     * \return                      function value
-     */
-    static double gauss(const double x, const double sigma)
-    {
-      const double u = x / sigma;
-
-      if (fabs(u) < 10.0)
-	return exp(-0.5*u*u);
-      else
-	return 0.0;
-    }
-
-
-    /**
-     * Normalised Gauss function.
-     *
-     * \param  x                    x
-     * \param  sigma                sigma
-     * \return                      function value
-     */
-    static double Gauss(const double x, const double sigma)
-    {
-      return gauss(x, sigma) / sqrt(2.0*JTOOLS::PI) / sigma;
-    }
-
-
-    /**
-     * Normalised Gauss function.
-     *
-     * \param  x                    x
-     * \param  x0                   central value
-     * \param  sigma                sigma
-     * \return                      function value
-     */
-    static double Gauss(const double x, const double x0, const double sigma)
-    {
-      return Gauss(x - x0, sigma);
     }
   };
 }

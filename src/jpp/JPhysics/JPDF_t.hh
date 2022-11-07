@@ -256,7 +256,7 @@ struct JMuonPDF_t {
     return h1;
   }
 
-  JPDF_t pdfA;   //!< PDF for minimum ionisong particle
+  JPDF_t pdfA;   //!< PDF for minimum ionising particle
   JPDF_t pdfB;   //!< PDF for average energy losses
   JPDF_t pdfC;   //!< PDF for delta-rays
 };
@@ -346,7 +346,7 @@ struct JShowerPDF_t {
    * The orientation of the PMT should be defined according this <a href="https://common.pages.km3net.de/jpp/JPDF.PDF">documentation</a>.\n
    * In this, the zenith and azimuth angles are limited to \f[\left[0, \pi\right]\f].
    *
-   * \param  E                  shower energy at minimum distance of approach [GeV]
+   * \param  E                  shower energy [GeV]
    * \param  D                  distance [m]
    * \param  cd                 cosine emission angle
    * \param  theta              PMT zenith  angle [rad]

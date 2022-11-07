@@ -43,7 +43,9 @@ struct JMuonNPE_t {
 
     const JPDFType_t pdf_t[] = { DIRECT_LIGHT_FROM_MUON,
 				 SCATTERED_LIGHT_FROM_MUON,
-				 DIRECT_LIGHT_FROM_EMSHOWERS,
+				 DIRECT_LIGHT_FROM_DELTARAYS,
+				 SCATTERED_LIGHT_FROM_DELTARAYS,
+ 				 DIRECT_LIGHT_FROM_EMSHOWERS,
 				 SCATTERED_LIGHT_FROM_EMSHOWERS };
 
     const  int N = sizeof(pdf_t) / sizeof(pdf_t[0]);
@@ -60,7 +62,8 @@ struct JMuonNPE_t {
 
       JPDF_t pdf;
 
-      const string file_name = getFilename(fileDescriptor, pdf_t[i]);
+      const JPDFType_t type      = pdf_t[i];
+      const string     file_name = getFilename(fileDescriptor, type);
 
       cout << "loading PDF from file " << file_name << "... " << flush;
 
@@ -70,10 +73,12 @@ struct JMuonNPE_t {
 
       pdf.setExceptionHandler(supervisor);
 
-      if (!is_bremsstrahlung(pdf_t[i]))
-	Y1.push_back(JNPE_t(pdf));
-      else
+      if      (is_bremsstrahlung(type))
 	YB.push_back(JNPE_t(pdf));
+      else if (is_deltarays(type))
+	YA.push_back(JNPE_t(pdf));
+      else
+	Y1.push_back(JNPE_t(pdf));
     }
 
     // Add PDFs
@@ -81,8 +86,9 @@ struct JMuonNPE_t {
     cout << "adding PDFs... " << flush;
 
     Y1[1].add(Y1[0]); Y1.erase(Y1.begin());
+    YA[1].add(YA[0]); YA.erase(YA.begin());
     YB[1].add(YB[0]); YB.erase(YB.begin());
-
+  
     cout << "OK" << endl;
   }
 
@@ -106,17 +112,19 @@ struct JMuonNPE_t {
   {
     using namespace JPP;
 
-    const double yA = getNPE(Y1, R, theta, phi);
+    const double y1 = getNPE(Y1, R, theta, phi);
+    const double yA = getNPE(YA, R, theta, phi);
     const double yB = getNPE(YB, R, theta, phi);
 
     if (E >= MASS_MUON * INDEX_OF_REFRACTION_WATER)
-      return yA + E * yB;
+      return y1  +  getDeltaRaysFromMuon(E) * yA  +  E * yB;
     else
       return 0.0;
   }
 
 private:
   std::vector<JNPE_t> Y1;     //!< light from muon
+  std::vector<JNPE_t> YA;     //!< light from delta-rays
   std::vector<JNPE_t> YB;     //!< light from EM showers
 
   /**

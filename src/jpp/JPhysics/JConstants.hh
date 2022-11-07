@@ -25,6 +25,7 @@ namespace JPHYSICS {
   static const double C                         = 0.299792458;          //!< Speed of light in vacuum [m/ns]
   static const double C_INVERSE                 = 1.0/C;                //!< Inverse speed of light in vacuum [ns/m]
   static const double AVOGADRO                  = 6.0221415e23;         //!< Avogadro's number [gr^-1]
+  static const double NUCLEON_MOLAR_MASS        = 1.0;                  //!< nucleon molar mass [g/mol]
   static const double H                         = 4.13566733e-15;       //!< Planck constant [eV s]
   static const double HBAR                      = H/(2*PI);             //!< Planck constant [eV s]
   static const double HBARC                     = HBAR*C*1.0e9;         //!< Planck constant [eV m]

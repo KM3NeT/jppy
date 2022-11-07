@@ -34,7 +34,7 @@ namespace JMATH {
   {
     const double u = x / sigma;
 
-    if (fabs(u) < 10.0)
+    if (fabs(u) < 20.0)
       return exp(-0.5*u*u);
     else
       return 0.0;
@@ -85,6 +85,10 @@ namespace JMATH {
   /**
    * Incomplete gamma function.
    *
+   * Source code is taken from reference:
+   * Numerical Recipes in C++, W.H. Press, S.A. Teukolsky, W.T. Vetterling and B.P. Flannery,
+   * Cambridge University Press.
+   *
    * \param  a                    a
    * \param  x                    x
    * \return                      function value
@@ -93,24 +97,28 @@ namespace JMATH {
   {
     using namespace std;
 
-    const int max = 100;
+    const int max = 1000000;
 
     if (x <  0.0) { THROW(JValueOutOfRange, "x <  0 " << x); }
     if (a <= 0.0) { THROW(JValueOutOfRange, "a <= 0 " << a); }
  
     const double gln = lgamma(a);
 
-    if (x <  a + 1.0) {
+    if (x < a + 1.0) {
 
-      if (x <= 0.0) { 
+      if (x < 0.0) { 
 	THROW(JValueOutOfRange, "x <= 0 " << x);
       }
 
+      if (x == 0.0) {
+	return 0.0;
+      }
+
       double ap  = a;
-      double sum = 1.0 /a;
+      double sum = 1.0 / a;
       double del = sum;
 
-      for (int i = 1; i != max; ++i) {
+      for (int i = 0; i != max; ++i) {
 
 	ap  += 1.0;
 	del *= x/ap;
@@ -121,10 +129,14 @@ namespace JMATH {
 	}
       }
 
+      THROW(JValueOutOfRange, "i == " << max);
+
     } else {
 
+      const double FPMIN = numeric_limits<double>::min() / numeric_limits<double>::epsilon();
+
       double b = x + 1.0 - a;
-      double c = numeric_limits<double>::epsilon() / numeric_limits<double>::min();
+      double c = 1.0 / FPMIN;
       double d = 1.0 / b;
       double h = d;
 
@@ -135,14 +147,14 @@ namespace JMATH {
 	b += 2.0;
 	d  = an*d + b;
 
-	if (fabs(d) < numeric_limits<double>::min()) {
-	  d = numeric_limits<double>::min();
+	if (fabs(d) < FPMIN) {
+	  d = FPMIN;
 	}
 
 	c  = b + an/c;
 
-	if (fabs(c) < numeric_limits<double>::min()) {
-	  c = numeric_limits<double>::min();
+	if (fabs(c) < FPMIN) {
+	  c = FPMIN;
 	}
 
 	d  = 1.0/d;
@@ -156,10 +168,8 @@ namespace JMATH {
 	}
       }
 
-      THROW(JValueOutOfRange, "a " << a);
+      THROW(JValueOutOfRange, "i == " << max);
     }
-
-    return 0.0;
   }
 
 
@@ -170,7 +180,7 @@ namespace JMATH {
    * \param  x                    x
    * \return                      function value
    */
-  inline double legendre(const unsigned int n, const double x)
+  inline double legendre(const size_t n, const double x)
   {
     switch (n) {
 
@@ -186,7 +196,7 @@ namespace JMATH {
 	double p1 = 1.0;
 	double p2 = x;
 
-	for (unsigned int i = 2; i <= n; ++i) {
+	for (size_t i = 2; i <= n; ++i) {
 	  p0 = p1;
 	  p1 = p2;
 	  p2 = ((2*i-1) * x*p1  -  (i-1) * p0) / i;
@@ -205,14 +215,14 @@ namespace JMATH {
    * \param  k                    k
    * \return                      function value
    */
-  inline double binomial(const int n, const int k)
+  inline double binomial(const size_t n, const size_t k)
   {
-    if (k == 0 || n == k) {
-      return 1.0;
+    if (n == 0 || n < k) {
+      return 0.0;
     }
 
-    if (n <= 0 || k < 0 || n < k) {
-      return 0.0;
+    if (k == 0 || n == k) {
+      return 1.0;
     }
 
     const int k1 = std::min(k, n - k);
@@ -225,6 +235,45 @@ namespace JMATH {
     }
 
     return value;
+  }
+
+
+  /**
+   * Poisson probability density distribition.
+   *
+   * \param  n                    number of occurences
+   * \param  mu                   expectation value
+   * \return                      probability
+   */
+  inline double poisson(const size_t n, const double mu)
+  {
+    using namespace std;
+
+    if (mu > 0.0) {
+
+      if (n > 0)
+	return exp(n*log(mu) - lgamma(n+1) - mu);
+      else
+	return exp(-mu);
+    } else if (mu == 0.0) {
+
+      return (n == 0 ? 1.0 : 0.0);
+    }
+ 
+    THROW(JValueOutOfRange, "mu <= 0 " << mu);
+  }
+
+
+  /**
+   * Poisson cumulative density distribition.
+   *
+   * \param  n                    number of occurences
+   * \param  mu                   expectation value
+   * \return                      probability
+   */
+  inline double Poisson(const size_t n, const double mu)
+  {
+    return 1.0 - Gamma(n + 1, mu);
   }
 }
 

@@ -1,9 +1,10 @@
 #ifndef __JTOOLS__JMULTIMAP__
 #define __JTOOLS__JMULTIMAP__
 
-#include "JLang/JSinglePointer.hh"
 #include "JLang/JEquals.hh"
 #include "JLang/JForwardIterator.hh"
+
+#include "JMath/JMath.hh"
 
 #include "JTools/JDistance.hh"
 #include "JTools/JPair.hh"
@@ -11,13 +12,12 @@
 #include "JTools/JMapList.hh"
 #include "JTools/JAbstractMultiMap.hh"
 #include "JTools/JMultiKey.hh"
-#include "JMath/JMath.hh"
 
 
 /**
  * \file
  *
- * JMultiMap is a general purpose multidimensional map based on a type list of maps.
+ * General purpose multidimensional map based on a type list of maps.
  * \author mdejong
  */
 namespace JTOOLS {}
@@ -38,11 +38,12 @@ namespace JTOOLS {
    * the third to the list of maps used; and
    * the fourth to the distance operator.
    *
-   * In addition to the standard STL iterators, there is a 
-   * super_[const_[reverse_]]iterator for linear access to the multidimensional map.
-   * The access from the super_iterator to the actual elements in the multidimensional map
-   * is handeld via a the standard dereference and pointer operators yielding 
-   * a multidimensional key (see JTOOLS::JMultiKey) or pair (see JTOOLS::JMultiPair), respectively.
+   * In addition to the standard STL iterators, 
+   * there are super iteretors for linear access to the multidimensional map.\n
+   * The access from a super iterator to the actual elements in the multidimensional map
+   * is handled via the usual dereference and pointer operators.\n
+   * The multidimensional key (see JTOOLS::JMultiKey) and value can directly be obtained
+   * via member methods <tt>%getKey()</tt> and <tt>%getValue()</tt>, respectively.
    */
   template<class JAbscissa_t,
 	   class JOrdinate_t,
@@ -69,19 +70,19 @@ namespace JTOOLS {
     
     typedef JHead_t<JAbscissa_t,
 		    JMultiMap<JAbscissa_t, JOrdinate_t, JTail_t, JDistance_t>,
-		    JDistance_t>                             map_type;
-    
-    typedef JAbscissa_t                                      abscissa_type;
-    typedef JOrdinate_t                                      ordinate_type;
+		    JDistance_t>                                               map_type;
 
-    typedef typename map_type::key_type                      key_type;
-    typedef typename map_type::mapped_type                   mapped_type;
-    typedef typename map_type::value_type                    value_type;
+    typedef JAbscissa_t                                                        abscissa_type;
+    typedef JOrdinate_t                                                        ordinate_type;
 
-    typedef typename map_type::const_iterator                const_iterator;
-    typedef typename map_type::const_reverse_iterator        const_reverse_iterator;
-    typedef typename map_type::iterator                      iterator;
-    typedef typename map_type::reverse_iterator              reverse_iterator;
+    typedef typename map_type::key_type                                        key_type;
+    typedef typename map_type::mapped_type                                     mapped_type;
+    typedef typename map_type::value_type                                      value_type;
+
+    typedef typename map_type::const_iterator                                  const_iterator;
+    typedef typename map_type::const_reverse_iterator                          const_reverse_iterator;
+    typedef typename map_type::iterator                                        iterator;
+    typedef typename map_type::reverse_iterator                                reverse_iterator;
 
     using map_type::insert; 
     using map_type::configure; 
@@ -194,35 +195,48 @@ namespace JTOOLS {
       }
     }
 
-    
-    class super_const_iterator;  // forward declaration
-
+  private:    
 
     /**
-     * Multidimensional iterator. 
+     * Base class for multidimensional iterator.
      */
-    class super_iterator :
-      public JEquals         <super_iterator>,
-      public JForwardIterator<super_iterator>
+    template<class first_iterator, class second_iterator>
+    struct iterator_base :
+      public JEquals< iterator_base<first_iterator, second_iterator> >
     {
+      typedef std::pair<first_iterator, first_iterator>                          range_type;
+      typedef typename second_iterator::value_type                               value_type;
+      typedef JMultiKey <NUMBER_OF_DIMENSIONS, const abscissa_type>              multikey_type;
+      typedef JMultiPair<NUMBER_OF_DIMENSIONS, const abscissa_type, value_type>  multipair_type;
 
-      friend class JMultiMap;
-      friend class super_const_iterator;
-
-    public:
-
-      typedef int                                                                difference_type;
-      typedef JPair<const key_type&, typename mapped_type::super_iterator&>      value_type;
-      typedef JLANG::JSinglePointer<value_type>                                  pointer;
-      typedef JMultiPair<NUMBER_OF_DIMENSIONS, const JAbscissa_t, JOrdinate_t&>  reference;
-      typedef std::forward_iterator_tag                                          iterator_category;
-      typedef JMultiKey <NUMBER_OF_DIMENSIONS, const JAbscissa_t>                multikey_type;
 
       /**
-       * Default constructor.
+       * Auxiliary class for smart pointer.
        */
-      super_iterator()
-      {}
+      struct pointer_type :
+	private JPair<const key_type, second_iterator&>
+      {
+	/**
+	 * Constructor.
+	 *
+	 * \param  key             key
+	 * \param  value           value
+	 */
+	pointer_type(const key_type key, second_iterator& value) :
+	  JPair<const key_type, second_iterator&>(key, value)
+	{}
+
+
+	/**
+	 * Smart pointer operator.
+	 *
+	 * \return          pointer to object
+	 */
+	const JPair<const key_type, second_iterator&>* operator->() const
+	{
+	  return this;
+	}
+      };
 
 
       /**
@@ -230,9 +244,9 @@ namespace JTOOLS {
        *
        * \return                 pointer to pair of iterators
        */
-      pointer operator->()
-      { 
-	return pointer(new value_type(i->getX(), second));
+      pointer_type operator->()
+      {
+	return pointer_type(i->getX(), second);
       }
 
 
@@ -241,49 +255,26 @@ namespace JTOOLS {
        *
        * \return                 multidimensional pair
        */
-      reference operator*()
+      multipair_type operator*()
       {
-	return reference(i->getX(), *second);
+	return multipair_type(i->getX(), *second);
       }
 
-
+      
       /**
        * Equality of super iterator.
        *
        * \param  cursor          super iterator
        * \return                 true if equal; else false
        */
-      virtual bool equals(const super_iterator& cursor) const
+      bool equals(const iterator_base& cursor) const
       {
 	return i == cursor.i && (i == range.second || second.equals(cursor.second));
       }
 
-
-      /**
-       * Increment super_iterator.
-       *
-       * \return                 true if valid; else false
-       */
-      virtual bool increment() override 
-      {
-	if (!second.increment()) {
-
-	  while (++i != range.second) {
-
-	    second = i->getY().super_begin();
-	    
-	    if (second != i->getY().super_end()) {
-	      break;
-	    }
-	  }
-	}
-
-	return i != range.second;
-      }
-
       
       /**
-       * Get multi-dimensional key.
+       * Get multidimensional key.
        *
        * \return                 key
        */
@@ -298,11 +289,160 @@ namespace JTOOLS {
        *
        * \return                 value
        */
-      JOrdinate_t& getValue() 
+      value_type& getValue() 
       {
-	return second.getValue();
+	return this->second.getValue();
       }
 
+
+    protected:
+      range_type      range;
+      first_iterator  i;
+      second_iterator second;
+    };
+
+
+    /**
+     * Helper class for multidimensional iterator.
+     */
+    template<class first_iterator, class second_iterator>
+    struct iterator_helper :
+      public iterator_base<first_iterator, second_iterator>,
+      public JForwardIterator< iterator_helper<first_iterator, second_iterator> >
+    {
+      /**
+       * Default constructor.
+       */
+      iterator_helper()
+      {}
+
+
+      /**
+       * Constructor.
+       *
+       * \param  __begin         begin of data
+       * \param  __end           end   of data
+       */
+      iterator_helper(first_iterator __begin,
+		      first_iterator __end)
+      {
+	this->range = std::make_pair(__begin, __end);
+
+	for (this->i = this->range.first; this->i != this->range.second; ++(this->i)) {
+
+	  this->second = this->i->getY().super_begin();
+
+	  if (this->second != this->i->getY().super_end()) {
+	    break;
+	  }
+	}
+      }
+
+
+      /**
+       * Increment super iterator.
+       *
+       * \return                 true if valid; else false
+       */
+      virtual bool increment() override
+      {
+	if (!this->second.increment()) {
+
+	  while (++(this->i) != this->range.second) {
+
+	    this->second = this->i->getY().super_begin();
+	    
+	    if (this->second != this->i->getY().super_end()) {
+	      break;
+	    }
+	  }
+	}
+
+	return this->i != this->range.second;
+      }
+    };
+
+
+    /**
+     * Helper class for multidimensional reverse iterator.
+     */
+    template<class first_iterator, class second_iterator>
+    struct reverse_iterator_helper :
+      public iterator_base<first_iterator, second_iterator>,
+      public JForwardIterator< reverse_iterator_helper<first_iterator, second_iterator> >
+    {
+      /**
+       * Default constructor.
+       */
+      reverse_iterator_helper()
+      {}
+      
+
+      /**
+       * Constructor.
+       *
+       * \param  __begin         begin of data
+       * \param  __end           end   of data
+       */
+      reverse_iterator_helper(first_iterator __begin,
+			      first_iterator __end)
+      {
+	this->range = std::make_pair(__begin, __end);
+
+	for (this->i = this->range.first; this->i != this->range.second; ++(this->i)) {
+
+	  this->second = this->i->getY().super_rbegin();
+
+	  if (this->second != this->i->getY().super_rend()) {
+	    break;
+	  }
+	}
+      }
+
+
+      /**
+       * Increment super iterator.
+       *
+       * \return                 true if valid; else false
+       */
+      virtual bool increment() override
+      {
+	if (!this->second.increment()) {
+
+	  while (++(this->i) != this->range.second) {
+
+	    this->second = this->i->getY().super_rbegin();
+	    
+	    if (this->second != this->i->getY().super_rend()) {
+	      break;
+	    }
+	  }
+	}
+
+	return this->i != this->range.second;
+      }
+    };
+
+  public:    
+
+    class super_const_iterator;  // forward declaration
+
+
+    /**
+     * Multidimensional iterator. 
+     */
+    struct super_iterator :
+      public iterator_helper<iterator, typename mapped_type::super_iterator>
+    {
+
+      friend class JMultiMap;
+      friend class super_const_iterator;
+
+      /**
+       * Default constructor.
+       */
+      super_iterator()
+      {}
 
     private:
       /**
@@ -313,44 +453,20 @@ namespace JTOOLS {
        */
       super_iterator(iterator __begin,
 		     iterator __end) :
-	range(__begin, __end)
-      {
-	for (i = range.first; i != range.second; ++i) {
-
-	  second = i->getY().super_begin();
-
-	  if (second != i->getY().super_end()) {
-	    break;
-	  }
-	}
-      }
-
-
-      std::pair<iterator, iterator> range;
-      iterator i;
-      typename mapped_type::super_iterator second;
+	iterator_helper<iterator, typename mapped_type::super_iterator>(__begin, __end)
+      {}
     };
 
 
     /**
      * Multidimensional const_iterator. 
      */
-    class super_const_iterator :
-      public JEquals         <super_const_iterator>,
-      public JForwardIterator<super_const_iterator>
+    struct super_const_iterator :
+      public iterator_helper<const_iterator, typename mapped_type::super_const_iterator>,
+      public JEquals<super_const_iterator, super_iterator>
     {
 
       friend class JMultiMap;
-
-    public:
-
-      typedef int                                                                      difference_type;
-      typedef JPair<const key_type&, typename mapped_type::super_const_iterator&>      value_type;
-      typedef JLANG::JSinglePointer<value_type>                                        pointer;
-      typedef JMultiPair<NUMBER_OF_DIMENSIONS, const JAbscissa_t, const JOrdinate_t&>  reference;
-      typedef std::forward_iterator_tag                                                iterator_category;      
-      typedef JMultiKey <NUMBER_OF_DIMENSIONS, const JAbscissa_t>                      multikey_type;
-      
 
       /**
        * Default constructor.
@@ -362,93 +478,38 @@ namespace JTOOLS {
       /**
        * Copy constructor.
        *
-       * \param  cursor          super_iterator
+       * \param  cursor          super iterator
        */
-      super_const_iterator(super_iterator cursor) :
-	range (cursor.range),
-	i     (cursor.i),
-	second(cursor.second)
-      {}
-
-
-      /**
-       * Smart pointer operator.
-       *
-       * \return                 pointer to pair of iterators
-       */
-      pointer operator->()
-      { 
-	return pointer(new value_type(i->getX(), second));
+      super_const_iterator(const super_iterator& cursor)
+      {
+	this->range  = cursor.range;
+	this->i      = cursor.i;
+	this->second = cursor.second;
       }
 
-
-      /**
-       * Dereference operator.
-       *
-       * \return                 multidimensional pair
-       */
-      reference operator*()
-      { 
-	return reference(i->getX(), *second);
-      }
-
-
+      
       /**
        * Equality of super iterator.
        *
        * \param  cursor          super iterator
        * \return                 true if equal; else false
        */
-      virtual bool equals(const super_const_iterator& cursor) const
+      bool equals(const super_const_iterator& cursor) const
       {
-	return i == cursor.i && (i == range.second || second.equals(cursor.second));
-      }
-
-
-      /**
-       * Increment super_iterator.
-       *
-       * \return                 true if valid; else false
-       */
-      virtual bool increment() override 
-      {
-	if (!second.increment()) {
-
-	  while (++i != range.second) {
-
-	    second = i->getY().super_begin();
-	    
-	    if (second != i->getY().super_end()) {
-	      break;
-	    }
-	  }
-	}
-
-	return i != range.second;
-      }
-
-
-      /**
-       * Get multi-dimensional key.
-       *
-       * \return                 key
-       */
-      multikey_type getKey() const
-      {
-	return multikey_type(i->getX(), second.getKey());
+	return static_cast<const iterator_base<const_iterator, typename mapped_type::super_const_iterator>&>(*this).equals(cursor);
       }
 
       
       /**
-       * Get value.
+       * Equality of super iterator.
        *
-       * \return                 value
+       * \param  cursor          super iterator
+       * \return                 true if equal; else false
        */
-      const JOrdinate_t& getValue() 
+      bool equals(const super_iterator& cursor) const
       {
-	return second.getValue();
+	return equals(super_const_iterator(cursor));
       }
-
 
     private:
       /**
@@ -459,22 +520,8 @@ namespace JTOOLS {
        */
       super_const_iterator(const_iterator __begin,
 			   const_iterator __end) :
-	range(__begin, __end)
-      {
-	for (i = range.first; i != range.second; ++i) {
-
-	  second = i->getY().super_begin();
-
-	  if (second != i->getY().super_end()) {
-	    break;
-	  }
-	}
-      }
-
-
-      std::pair<const_iterator, const_iterator> range;
-      const_iterator i;
-      typename mapped_type::super_const_iterator second;
+	iterator_helper<const_iterator, typename mapped_type::super_const_iterator>(__begin, __end)
+      {}
     };
 
     
@@ -484,109 +531,18 @@ namespace JTOOLS {
     /**
      * Multidimensional reverse iterator. 
      */
-    class super_reverse_iterator :
-      public JEquals         <super_reverse_iterator>,
-      public JForwardIterator<super_reverse_iterator>
+    struct super_reverse_iterator :
+      public reverse_iterator_helper<reverse_iterator, typename mapped_type::super_reverse_iterator>
     {
 
       friend class JMultiMap;
       friend class super_const_reverse_iterator;
 
-    public:
-
-      typedef int                                                                        difference_type;
-      typedef JPair<const key_type&, typename mapped_type::super_reverse_iterator&>      value_type;
-      typedef JLANG::JSinglePointer<value_type>                                          pointer;
-      typedef JMultiPair<NUMBER_OF_DIMENSIONS, const JAbscissa_t, JOrdinate_t&>          reference;
-      typedef std::forward_iterator_tag                                                  iterator_category;
-      typedef JMultiKey <NUMBER_OF_DIMENSIONS, const JAbscissa_t>                        multikey_type;
-
-      
       /**
        * Default constructor.
        */
       super_reverse_iterator()
       {}
-
-
-      /**
-       * Smart pointer operator.
-       *
-       * \return                 pointer to pair of iterators
-       */
-      pointer operator->()
-      { 
-	return pointer(new value_type(i->getX(), second));
-      }
-
-
-      /**
-       * Dereference operator.
-       *
-       * \return                 multidimensional pair
-       */
-      reference operator*()
-      {
-	return reference(i->getX(), *second);
-      }
-
-
-      /**
-       * Equality of super reverse iterator.
-       *
-       * \param  cursor          super reverse iterator
-       * \return                 true if equal; else false
-       */
-      virtual bool equals(const super_reverse_iterator& cursor) const
-      {
-	return i == cursor.i && (i == range.second || second.equals(cursor.second));
-      }
-
-
-      /**
-       * Increment super_iterator.
-       *
-       * \return                 true if valid; else false
-       */
-      virtual bool increment() override 
-      {
-	if (!second.increment()) {
-
-	  while (++i != range.second) {
-
-	    second = i->getY().super_rbegin();
-	    
-	    if (!second.equals(i->getY().super_rend())) {
-	      break;
-	    }
-	  }
-	}
-
-	return i != range.second;
-      }
-
-      
-      /**
-       * Get multi-dimensional key.
-       *
-       * \return                 key
-       */
-      multikey_type getKey() const
-      {
-	return multikey_type(i->getX(), second.getKey());
-      }
-
-      
-      /**
-       * Get value.
-       *
-       * \return                 value
-       */
-      JOrdinate_t& getValue() 
-      {
-	return second.getValue();
-      }
-
 
     private:
       /**
@@ -597,44 +553,20 @@ namespace JTOOLS {
        */
       super_reverse_iterator(reverse_iterator __begin,
 			     reverse_iterator __end) :
-	range(__begin, __end)
-      {
-	for (i = range.first; i != range.second; ++i) {
-
-	  second = i->getY().super_rbegin();
-
-	  if (!second.equals(i->getY().super_rend())) {
-	    break;
-	  }
-	}
-      }
-
-
-      std::pair<reverse_iterator, reverse_iterator> range;
-      reverse_iterator i;
-      typename mapped_type::super_reverse_iterator second;
+	reverse_iterator_helper<reverse_iterator, typename mapped_type::super_reverse_iterator>(__begin, __end)
+      {}
     };
 
 
     /**
-     * Multidimensional const_reverse_iterator. 
+     * Multidimensional const reverse iterator. 
      */
-    class super_const_reverse_iterator :
-      public JEquals         <super_const_reverse_iterator>,
-      public JForwardIterator<super_const_reverse_iterator>
+    struct super_const_reverse_iterator :
+      public reverse_iterator_helper<const_reverse_iterator, typename mapped_type::super_const_reverse_iterator>,
+      public JEquals<super_const_reverse_iterator, super_reverse_iterator>
     {
 
       friend class JMultiMap;
-
-    public:
-
-      typedef int                                                                              difference_type;
-      typedef JPair<const key_type&, typename mapped_type::super_const_reverse_iterator&>      value_type;
-      typedef JLANG::JSinglePointer<value_type>                                                pointer;
-      typedef JMultiPair<NUMBER_OF_DIMENSIONS, const JAbscissa_t, const JOrdinate_t&>          reference;
-      typedef std::forward_iterator_tag                                                        iterator_category;      
-      typedef JMultiKey <NUMBER_OF_DIMENSIONS, const JAbscissa_t>                              multikey_type;
-      
 
       /**
        * Default constructor.
@@ -646,93 +578,38 @@ namespace JTOOLS {
       /**
        * Copy constructor.
        *
-       * \param  cursor          super_iterator
+       * \param  cursor          super reverse iterator
        */
-      super_const_reverse_iterator(super_reverse_iterator cursor) :
-	range (cursor.range),
-	i     (cursor.i),
-	second(cursor.second)
-      {}
-
-
-      /**
-       * Smart pointer operator.
-       *
-       * \return                 pointer to pair of iterators
-       */
-      pointer operator->()
-      { 
-	return pointer(new value_type(i->getX(), second));
+      super_const_reverse_iterator(super_reverse_iterator cursor)
+      {
+	this->range  = cursor.range;
+	this->i      = cursor.i;
+	this->second = cursor.second;
       }
 
-
-      /**
-       * Dereference operator.
-       *
-       * \return                 multidimensional pair
-       */
-      reference operator*()
-      { 
-	return reference(i->getX(), *second);
-      }
-
-
+      
       /**
        * Equality of super reverse iterator.
        *
        * \param  cursor          super reverse iterator
        * \return                 true if equal; else false
        */
-      virtual bool equals(const super_const_reverse_iterator& cursor) const
+      bool equals(const super_const_reverse_iterator& cursor) const
       {
-	return i == cursor.i && (i == range.second || second.equals(cursor.second));
-      }
-
-
-      /**
-       * Increment super_iterator.
-       *
-       * \return                 true if valid; else false
-       */
-      virtual bool increment() override 
-      {
-	if (!second.increment()) {
-
-	  while (++i != range.second) {
-
-	    second = i->getY().super_rbegin();
-	    
-	    if (second != i->getY().super_rend()) {
-	      break;
-	    }
-	  }
-	}
-
-	return i != range.second;
-      }
-
-
-      /**
-       * Get multi-dimensional key.
-       *
-       * \return                 key
-       */
-      multikey_type getKey() const
-      {
-	return multikey_type(i->getX(), second.getKey());
+	return static_cast<const iterator_base<const_reverse_iterator, typename mapped_type::super_const_reverse_iterator>&>(*this).equals(cursor);
       }
 
       
       /**
-       * Get value.
+       * Equality of super reverse iterator.
        *
-       * \return                 value
+       * \param  cursor          super reverse iterator
+       * \return                 true if equal; else false
        */
-      const JOrdinate_t& getValue() 
+      bool equals(const super_reverse_iterator& cursor) const
       {
-	return second.getValue();
+	return equals(super_const_reverse_iterator(cursor));
       }
-
 
     private:
       /**
@@ -743,27 +620,13 @@ namespace JTOOLS {
        */
       super_const_reverse_iterator(const_reverse_iterator __begin,
 				   const_reverse_iterator __end) :
-	range(__begin, __end)
-      {
-	for (i = range.first; i != range.second; ++i) {
-
-	  second = i->getY().super_rbegin();
-
-	  if (second != i->getY().super_rend()) {
-	    break;
-	  }
-	}
-      }
-
-
-      std::pair<const_reverse_iterator, const_reverse_iterator> range;
-      const_reverse_iterator i;
-      typename mapped_type::super_const_reverse_iterator second;
+	reverse_iterator_helper<const_reverse_iterator, typename mapped_type::super_const_reverse_iterator>(__begin, __end)
+      {}
     };
 
 
     /**
-     * Get super_iterator to begin of data.
+     * Get super iterator to begin of data.
      * 
      * \return                 super iterator
      */
@@ -774,7 +637,7 @@ namespace JTOOLS {
 
 
     /**
-     * Get super_reverse_iterator to reverse begin of data
+     * Get super iterator to reverse begin of data
      *
      * \return                  super reverse iterator
      */
@@ -785,7 +648,7 @@ namespace JTOOLS {
  
    
     /**
-     * Get super_iterator to end of data.
+     * Get super iterator to end of data.
      *
      * \return                 super iterator
      */
@@ -796,7 +659,7 @@ namespace JTOOLS {
 
 
     /**
-     * Get super_reverse_iterator to end of data.
+     * Get super iterator to reverse end of data.
      *
      * \return                 super reverse iterator
      */
@@ -807,7 +670,7 @@ namespace JTOOLS {
 
 
     /**
-     * Get super_iterator to begin of data.
+     * Get super iterator to begin of data.
      *
      * \return                 super iterator
      */
@@ -818,7 +681,7 @@ namespace JTOOLS {
 
 
     /**
-     * Get super_reverse_iterator to begin of data.
+     * Get super iterator to reverse begin of data.
      *
      * \return                 super iterator
      */
@@ -829,7 +692,7 @@ namespace JTOOLS {
  
    
     /**
-     * Get super_iterator to end of data.
+     * Get super iterator to end of data.
      *
      * \return                 super iterator
      */
@@ -840,7 +703,7 @@ namespace JTOOLS {
 
 
     /**
-     * Get super_reverse_iterator to end of data.
+     * Get super iterator to reverse end of data.
      *
      * \return                 super iterator
      */
@@ -856,7 +719,7 @@ namespace JTOOLS {
      * \param  key             multidimensional key
      * \return                 value
      */
-    ordinate_type& get(const JMultiKey<NUMBER_OF_DIMENSIONS, abscissa_type>& key)
+    ordinate_type& get(const JMultiKey<NUMBER_OF_DIMENSIONS, const abscissa_type>& key)
     {
       return this->get(key.first).get(key.second);
     }
@@ -868,7 +731,7 @@ namespace JTOOLS {
      * \param  key             multidimensional key
      * \param  value           value
      */
-    void insert(const JMultiKey<NUMBER_OF_DIMENSIONS, abscissa_type>& key, const ordinate_type& value)
+    void insert(const JMultiKey<NUMBER_OF_DIMENSIONS, const abscissa_type>& key, const ordinate_type& value)
     {
       (*this)[key.first].insert(key.second, value);
     }
@@ -879,7 +742,7 @@ namespace JTOOLS {
      *
      * \param  value           multidimensional pair
      */
-    void insert(const JMultiPair<NUMBER_OF_DIMENSIONS, abscissa_type, ordinate_type>& value)
+    void insert(const JMultiPair<NUMBER_OF_DIMENSIONS, const abscissa_type, const ordinate_type&>& value)
     {
       (*this)[value.first].insert(value.second);
     }
@@ -888,20 +751,9 @@ namespace JTOOLS {
     /**
      * Insert element.
      *
-     * \param  value           multidimensional iterator value
+     * \param  value           multidimensional pair
      */
-    void insert(const typename super_iterator::reference& value)
-    {
-      (*this)[value.first].insert(value.second);
-    }
-
-
-    /**
-     * Insert element.
-     *
-     * \param  value           multidimensional iterator value
-     */
-    void insert(const typename super_const_iterator::reference& value)
+    void insert(const JMultiPair<NUMBER_OF_DIMENSIONS, const abscissa_type, ordinate_type&>& value)
     {
       (*this)[value.first].insert(value.second);
     }
@@ -923,21 +775,20 @@ namespace JTOOLS {
 
     enum { NUMBER_OF_DIMENSIONS = 1 };
 
-    typedef JHead_t<JAbscissa_t, JOrdinate_t, JDistance_t>   map_type;
+    typedef JHead_t<JAbscissa_t, JOrdinate_t, JDistance_t>                     map_type;
     
-    typedef JAbscissa_t                                      abscissa_type;
-    typedef JOrdinate_t                                      ordinate_type;
+    typedef JAbscissa_t                                                        abscissa_type;
+    typedef JOrdinate_t                                                        ordinate_type;
 
-    typedef typename map_type::key_type                      key_type;
-    typedef typename map_type::mapped_type                   mapped_type;
-    typedef typename map_type::value_type                    value_type;
+    typedef typename map_type::key_type                                        key_type;
+    typedef typename map_type::mapped_type                                     mapped_type;
+    typedef typename map_type::value_type                                      value_type;
 
-    typedef typename map_type::const_iterator                const_iterator;
-    typedef typename map_type::const_reverse_iterator        const_reverse_iterator;
-
-    typedef typename map_type::iterator                      iterator;
-    typedef typename map_type::reverse_iterator              reverse_iterator;
-
+    typedef typename map_type::const_iterator                                  const_iterator;
+    typedef typename map_type::const_reverse_iterator                          const_reverse_iterator;
+    typedef typename map_type::iterator                                        iterator;
+    typedef typename map_type::reverse_iterator                                reverse_iterator;
+     
     using map_type::insert; 
     using map_type::configure; 
     using map_type::get; 
@@ -1041,35 +892,68 @@ namespace JTOOLS {
       this->configure(bounds(key));
     }
 
-
-    class super_const_iterator;  // forward declaration
-
+  private:
 
     /**
-     * Terminator class of multidimensional iterator. 
+     * Helper class for multidimensional iterator.
      */
-    class super_iterator :
-      public JEquals         <super_iterator>,
-      public JForwardIterator<super_iterator>
+    template<class iterator_type, class ordinate_type>
+    struct iterator_helper :
+      public JEquals         < iterator_helper<iterator_type, ordinate_type> >,
+      public JForwardIterator< iterator_helper<iterator_type, ordinate_type> >
     {
+      typedef std::pair<iterator_type, iterator_type>                            range_type;
+      typedef ordinate_type                                                      value_type;
+      typedef JMultiKey <NUMBER_OF_DIMENSIONS, const abscissa_type>              multikey_type;
+      typedef JMultiPair<NUMBER_OF_DIMENSIONS, const abscissa_type, value_type>  multipair_type;
 
-      friend class JMultiMap;
-      friend class super_const_iterator;
 
-    public:
+      /**
+       * Auxiliary class for pair via smart pointer.
+       */
+      struct pointer_type :
+	private JPair<const key_type, value_type>
+      {
+	/**
+	 * Constructor.
+	 *
+	 * \param  key             key
+	 * \param  value           value
+	 */
+	pointer_type(const key_type key, value_type value) :
+	  JPair<const key_type, value_type>(key, value)
+	{}
 
-      typedef size_t                                          difference_type;      
-      typedef JPair<const key_type&, mapped_type&>            value_type;
-      typedef JLANG::JSinglePointer<value_type>               pointer;
-      typedef JMultiPair<1, const JAbscissa_t, JOrdinate_t&>  reference;
-      typedef std::forward_iterator_tag                       iterator_category;      
-      typedef JMultiKey <1, const JAbscissa_t>                multikey_type;
 
+	/**
+	 * Smart pointer operator.
+	 *
+	 * \return          pointer to object
+	 */
+	const JPair<const key_type, value_type>* operator->() const
+	{
+	  return this;
+	}
+      };
+    
 
       /**
        * Default constructor.
        */
-      super_iterator()
+      iterator_helper()
+      {}
+      
+
+      /**
+       * Constructor.
+       *
+       * \param  __begin         begin of data
+       * \param  __end           end   of data
+       */
+      iterator_helper(iterator_type __begin,
+		      iterator_type __end) :
+	range(__begin, __end),
+	i(__begin)
       {}
 
 
@@ -1078,9 +962,9 @@ namespace JTOOLS {
        *
        * \return                 pointer to pair of iterators
        */
-      pointer operator->()
-      { 
-	return pointer(new value_type(i->getX(), i->getY()));
+      pointer_type operator->()
+      {
+	return pointer_type(i->getX(), i->getY());
       }
 
 
@@ -1089,37 +973,37 @@ namespace JTOOLS {
        *
        * \return                 multidimensional pair
        */
-      reference operator*()
+      multipair_type operator*()
       { 
-	return reference(i->getX(), i->getY());
+	return multipair_type(i->getX(), i->getY());
       }
 
-
+      
       /**
        * Equality of super iterator.
        *
        * \param  cursor          super iterator
        * \return                 true if equal; else false
        */
-      virtual bool equals(const super_iterator& cursor) const
+      bool equals(const iterator_helper& cursor) const
       {
 	return i == cursor.i;
       }
 
 
       /**
-       * Increment super_iterator.
+       * Increment super iterator.
        *
        * \return                 true if valid; else false
        */
-      virtual bool increment() override 
+      virtual bool increment() override
       {
 	return ++i != range.second;
       }
 
-      
+
       /**
-       * Get multi-dimensional key.
+       * Get multidimensional key.
        *
        * \return                 key
        */
@@ -1134,10 +1018,36 @@ namespace JTOOLS {
        *
        * \return                 value
        */
-      JOrdinate_t& getValue() 
+      value_type getValue() 
       {
 	return i->getY();
       }
+
+      
+      range_type    range;
+      iterator_type i;
+    };
+
+  public:
+
+    class super_const_iterator;  // forward declaration
+
+
+    /**
+     * Terminator class of multidimensional iterator. 
+     */
+    struct super_iterator :
+      public iterator_helper<iterator, ordinate_type&>
+    {
+
+      friend class JMultiMap;
+      friend class super_const_iterator;
+
+      /**
+       * Default constructor.
+       */
+      super_iterator()
+      {}
 
     private:
       /**
@@ -1148,35 +1058,20 @@ namespace JTOOLS {
        */
       super_iterator(iterator __begin,
 		     iterator __end) :
-	range(__begin, __end),
-	i    (__begin)
+	iterator_helper<iterator, ordinate_type&>(__begin, __end)
       {}
-
-
-      std::pair<iterator, iterator> range;
-      iterator i;
     };
 
 
     /**
      * Terminator class of multidimensional const_iterator. 
      */
-    class super_const_iterator :
-      public JEquals         <super_const_iterator>,
-      public JForwardIterator<super_const_iterator>
+    struct super_const_iterator :
+      public iterator_helper<const_iterator, const ordinate_type&>,
+      public JEquals<super_const_iterator, super_iterator>
     {
 
       friend class JMultiMap;
-
-    public:
-
-      typedef size_t                                                difference_type;      
-      typedef JPair<const key_type&, const mapped_type&>            value_type;
-      typedef JLANG::JSinglePointer<value_type>                     pointer;
-      typedef JMultiPair<1, const JAbscissa_t, const JOrdinate_t&>  reference;
-      typedef std::forward_iterator_tag                             iterator_category;      
-      typedef JMultiKey <1, const JAbscissa_t>                      multikey_type;
-      
 
       /**
        * Default constructor.
@@ -1188,78 +1083,36 @@ namespace JTOOLS {
       /**
        * Copy constructor.
        *
-       * \param  cursor          super_iterator
+       * \param  cursor          super iterator
        */
-      super_const_iterator(super_iterator cursor) :
-	range(cursor.range),
-	i    (cursor.i)
-      {}
-
-
-      /**
-       * Smart pointer operator.
-       *
-       * \return                 pointer to pair of iterators
-       */
-      pointer operator->()
+      super_const_iterator(super_iterator cursor)
       {
-	return pointer(new value_type(i->getX(), i->getY()));
+	this->range = cursor.range;
+	this->i     = cursor.i;
       }
 
-
-      /**
-       * Dereference operator.
-       *
-       * \return                 multidimensional pair
-       */
-      reference operator*()
-      { 
-	return reference(i->getX(), i->getY());
-      }
-
-
+      
       /**
        * Equality of super iterator.
        *
        * \param  cursor          super iterator
        * \return                 true if equal; else false
        */
-      virtual bool equals(const super_const_iterator& cursor) const
+      bool equals(const super_const_iterator& cursor) const
       {
-	return i == cursor.i;
-      }
-
-
-      /**
-       * Increment super_iterator.
-       *
-       * \return                 true if valid; else false
-       */
-      virtual bool increment() override 
-      {
-	return ++i != range.second;
+	return this->i == cursor.i;
       }
 
       
       /**
-       * Get multi-dimensional key.
+       * Equality of super iterator.
        *
-       * \return                 key
+       * \param  cursor          super iterator
+       * \return                 true if equal; else false
        */
-      multikey_type getKey() const
+      bool equals(const super_iterator& cursor) const
       {
-	return multikey_type(i->getX());
-      }
-
-      
-      /**
-       * Get value.
-       *
-       * \return                 value
-       */
-      const JOrdinate_t& getValue() 
-      {
-	return i->getY();
+	return this->i == cursor.i;
       }
 
     private:
@@ -1271,13 +1124,8 @@ namespace JTOOLS {
        */
       super_const_iterator(const_iterator __begin,
 			   const_iterator __end) :
-	range(__begin, __end),
-	i    (__begin)
+	iterator_helper<const_iterator, const ordinate_type&>(__begin, __end)
       {}
-
-
-      std::pair<const_iterator, const_iterator> range;
-      const_iterator i;
     };
 
 
@@ -1287,96 +1135,18 @@ namespace JTOOLS {
     /**
      * Terminator class of multidimensional reverse iterator. 
      */
-    class super_reverse_iterator :
-      public JEquals         <super_iterator>,
-      public JForwardIterator<super_iterator>
+    struct super_reverse_iterator :
+      public iterator_helper<reverse_iterator, ordinate_type&>
     {
 
       friend class JMultiMap;
       friend class super_const_reverse_iterator;
-
-    public:
-
-      typedef size_t                                          difference_type;      
-      typedef JPair<const key_type&, mapped_type&>            value_type;
-      typedef JLANG::JSinglePointer<value_type>               pointer;
-      typedef JMultiPair<1, const JAbscissa_t, JOrdinate_t&>  reference;
-      typedef std::forward_iterator_tag                       iterator_category;      
-      typedef JMultiKey <1, const JAbscissa_t>                multikey_type;
-
 
       /**
        * Default constructor.
        */
       super_reverse_iterator()
       {}
-
-
-      /**
-       * Smart pointer operator.
-       *
-       * \return                 pointer to pair of reverse iterators
-       */
-      pointer operator->()
-      { 
-	return pointer(new value_type(i->getX(), i->getY()));
-      }
-
-
-      /**
-       * Dereference operator.
-       *
-       * \return                 multidimensional pair
-       */
-      reference operator*()
-      { 
-	return reference(i->getX(), i->getY());
-      }
-
-
-      /**
-       * Equality of super reverse iterator.
-       *
-       * \param  cursor          super reverse iterator
-       * \return                 true if equal; else false
-       */
-      virtual bool equals(const super_reverse_iterator& cursor) const
-      {
-	return i == cursor.i;
-      }
-
-
-      /**
-       * Increment super_reverse_iterator.
-       *
-       * \return                 true if valid; else false
-       */
-      virtual bool increment() override 
-      {
-	return ++i != range.second;
-      }
-
-      
-      /**
-       * Get multi-dimensional key.
-       *
-       * \return                 key
-       */
-      multikey_type getKey() const
-      {
-	return multikey_type(i->getX());
-      }
-
-      
-      /**
-       * Get value.
-       *
-       * \return                 value
-       */
-      JOrdinate_t& getValue() 
-      {
-	return i->getY();
-      }
 
     private:
       /**
@@ -1387,35 +1157,20 @@ namespace JTOOLS {
        */
       super_reverse_iterator(reverse_iterator __begin,
 			     reverse_iterator __end) :
-	range(__begin, __end),
-	i    (__begin)
+	iterator_helper<reverse_iterator, ordinate_type&>(__begin, __end)
       {}
-
-
-      std::pair<reverse_iterator, reverse_iterator> range;
-      reverse_iterator i;
     };
 
 
     /**
      * Terminator class of multidimensional const_iterator. 
      */
-    class super_const_reverse_iterator :
-      public JEquals         <super_const_reverse_iterator>,
-      public JForwardIterator<super_const_reverse_iterator>
+    struct super_const_reverse_iterator :
+      public iterator_helper<const_reverse_iterator, const ordinate_type&>,
+      public JEquals<super_const_reverse_iterator, super_reverse_iterator>
     {
 
       friend class JMultiMap;
-
-    public:
-
-      typedef size_t                                                difference_type;      
-      typedef JPair<const key_type&, const mapped_type&>            value_type;
-      typedef JLANG::JSinglePointer<value_type>                     pointer;
-      typedef JMultiPair<1, const JAbscissa_t, const JOrdinate_t&>  reference;
-      typedef std::forward_iterator_tag                             iterator_category;      
-      typedef JMultiKey <1, const JAbscissa_t>                      multikey_type;
-      
 
       /**
        * Default constructor.
@@ -1427,78 +1182,36 @@ namespace JTOOLS {
       /**
        * Copy constructor.
        *
-       * \param  cursor          super_iterator
+       * \param  cursor          super reverse iterator
        */
-      super_const_reverse_iterator(super_reverse_iterator cursor) :
-	range(cursor.range),
-	i    (cursor.i)
-      {}
-
-
-      /**
-       * Smart pointer operator.
-       *
-       * \return                 pointer to pair of iterators
-       */
-      pointer operator->()
+      super_const_reverse_iterator(super_reverse_iterator cursor)
       {
-	return pointer(new value_type(i->getX(), i->getY()));
+	this->range = cursor.range;
+	this->i     = cursor.i;
       }
 
-
-      /**
-       * Dereference operator.
-       *
-       * \return                 multidimensional pair
-       */
-      reference operator*()
-      { 
-	return reference(i->getX(), i->getY());
-      }
-
-
+      
       /**
        * Equality of super reverse iterator.
        *
        * \param  cursor          super reverse iterator
        * \return                 true if equal; else false
        */
-      virtual bool equals(const super_const_reverse_iterator& cursor) const
+      bool equals(const super_const_reverse_iterator& cursor) const
       {
-	return i == cursor.i;
-      }
-
-
-      /**
-       * Increment super_iterator.
-       *
-       * \return                 true if valid; else false
-       */
-      virtual bool increment() override 
-      {
-	return ++i != range.second;
+	return this->i == cursor.i;
       }
 
       
       /**
-       * Get multi-dimensional key.
+       * Equality of super reverse iterator.
        *
-       * \return                 key
+       * \param  cursor          super reverse iterator
+       * \return                 true if equal; else false
        */
-      multikey_type getKey() const
+      bool equals(const super_reverse_iterator& cursor) const
       {
-	return multikey_type(i->getX());
-      }
-
-      
-      /**
-       * Get value.
-       *
-       * \return                 value
-       */
-      const JOrdinate_t& getValue() 
-      {
-	return i->getY();
+	return this->i == cursor.i;
       }
 
     private:
@@ -1510,20 +1223,15 @@ namespace JTOOLS {
        */
       super_const_reverse_iterator(const_reverse_iterator __begin,
 				   const_reverse_iterator __end) :
-	range(__begin, __end),
-	i    (__begin)
+	iterator_helper<const_reverse_iterator, const ordinate_type&>(__begin, __end)
       {}
-
-
-      std::pair<const_reverse_iterator, const_reverse_iterator> range;
-      const_reverse_iterator i;
     };
 
 
-     /**
-     * Get super_iterator to begin of data.
+    /**
+     * Get super iterator to begin of data.
      *
-     * \return             super_iterator
+     * \return             super iterator
      */
     super_const_iterator super_begin() const
     {
@@ -1532,9 +1240,9 @@ namespace JTOOLS {
 
 
     /**
-     * Get super_reverse_iterator to reverse begin of data.
+     * Get super iterator to reverse begin of data.
      *
-     * \return             super_reverse_iterator
+     * \return             super reverse iterator
      */
     super_const_reverse_iterator super_rbegin() const
     {
@@ -1543,9 +1251,9 @@ namespace JTOOLS {
  
    
     /**
-     * Get super_iterator to end of data.
+     * Get super iterator to end of data.
      *
-     * \return             super_iterator
+     * \return             super iterator
      */
     super_const_iterator super_end() const
     {
@@ -1554,9 +1262,9 @@ namespace JTOOLS {
 
     
     /**
-     * Get super_reverse_iterator to reverse end of data.
+     * Get super iterator to reverse end of data.
      *
-     * \return             super_reverse_iterator
+     * \return             super reverse iterator
      */
     super_const_reverse_iterator super_rend() const
     {
@@ -1565,9 +1273,9 @@ namespace JTOOLS {
 
 
     /**
-     * Get super_iterator to begin of data.
+     * Get super iterator to begin of data.
      *
-     * \return             super_iterator
+     * \return             super iterator
      */
     super_iterator super_begin()
     {
@@ -1576,9 +1284,9 @@ namespace JTOOLS {
 
 
     /**
-     * Get super_reverse_iterator to reverse begin of data.
+     * Get super iterator to reverse begin of data.
      *
-     * \return             super_reverse_iterator
+     * \return             super reverse iterator
      */
     super_reverse_iterator super_rbegin()
     {
@@ -1587,9 +1295,9 @@ namespace JTOOLS {
  
    
     /**
-     * Get super_iterator to end of data.
+     * Get super iterator to end of data.
      *
-     * \return             super_iterator
+     * \return             super iterator
      */
     super_iterator super_end()
     {
@@ -1598,9 +1306,9 @@ namespace JTOOLS {
  
    
     /**
-     * Get super_reverse_iterator to end of data.
+     * Get super iterator to reverse end of data.
      *
-     * \return             super_reverse_iterator
+     * \return             super reverse iterator
      */
     super_reverse_iterator super_rend()
     {
@@ -1614,7 +1322,7 @@ namespace JTOOLS {
      * \param  key             multidimensional key
      * \return                 value
      */
-    ordinate_type& get(const JMultiKey<1, abscissa_type>& key)
+    ordinate_type& get(const JMultiKey<NUMBER_OF_DIMENSIONS, abscissa_type>& key)
     {
       return get(key.first);
     }
@@ -1626,7 +1334,7 @@ namespace JTOOLS {
      * \param  key          multidimensional key
      * \param  value        value
      */
-    void insert(const JMultiKey<1, JAbscissa_t>& key, const JOrdinate_t& value)
+    void insert(const JMultiKey<NUMBER_OF_DIMENSIONS, const abscissa_type>& key, const ordinate_type& value)
     {
       insert(value_type(key.first, value));
     }
@@ -1637,7 +1345,7 @@ namespace JTOOLS {
      *
      * \param  value        multidimensional pair
      */
-    void insert(const JMultiPair<1, JAbscissa_t, JOrdinate_t>& value)
+    void insert(const JMultiPair<NUMBER_OF_DIMENSIONS, const abscissa_type, const ordinate_type&>& value)
     {
       insert(value_type(value.first, value.second));
     }
@@ -1646,20 +1354,9 @@ namespace JTOOLS {
     /**
      * Insert element.
      *
-     * \param  value        multidimensional iterator value
+     * \param  value        multidimensional pair
      */
-    void insert(const typename super_iterator::reference& value)
-    {
-      insert(value_type(value.first, value.second));
-    }
-
-
-    /**
-     * Insert element.
-     *
-     * \param  value        multidimensional iterator value
-     */
-    void insert(const typename super_const_iterator::reference& value)
+    void insert(const JMultiPair<NUMBER_OF_DIMENSIONS, const abscissa_type, ordinate_type&>& value)
     {
       insert(value_type(value.first, value.second));
     }
